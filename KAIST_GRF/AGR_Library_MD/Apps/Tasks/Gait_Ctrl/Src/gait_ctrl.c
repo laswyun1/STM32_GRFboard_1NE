@@ -221,7 +221,7 @@ static void StateOff_Run(void)
 
 static void StateStandby_Run(void)
 {
-//	RunGetIMUFunction();
+	RunGetIMUFunction();
 	gaitCtrlLoopCnt = 0;
 }
 
@@ -368,7 +368,7 @@ static void GetInitialAngle_IMU(IOIF_6AxisData_t* imu6AxisData, WIDM_SensorData_
 	float tImuAngle			= 0.0;
 
 	for (uint8_t i = 1; i <= tTotalSamples; i++) {
-        for (uint16_t j = 0; j < 50000; j++) {
+        for (uint16_t j = 0; j < 30000; j++) {
         	// For delay of DMA reading
         }
 
