@@ -59,7 +59,7 @@ static int GRFNodeIDCheck(uint8_t directionSet);
 /* ------------------- STATIC FUNCTIONS ------------------- */
 /* Functions for Grf Parameters */
 static int GetRawGRF(GRF_Data_t* grfDataObj);
-static uint16_t PositiveDef(int num);
+
 /* ------------------- SDO CALLBACK ------------------- */
 //static void SetMagIronErrorInfo(DOP_SDOArgs_t* t_req, DOP_SDOArgs_t* t_res);
 
@@ -103,6 +103,14 @@ void InitGrfCtrl(void)
 	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[0]);
 	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[1]);
 	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[2]);
+
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS3[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS3[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS3[2]);
+
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS4[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS4[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS4[2]);
 
 	// SDO
 	DOP_COMMON_SDO_CREATE(TASK_ID_GRF)
@@ -228,17 +236,6 @@ static int GRFNodeIDCheck(uint8_t directionSet)
 	return nodeID;
 }
 
-static uint16_t PositiveDef(int num)
-{
-	if (0 < num && num < 65536) {
-		return (uint16_t)num;
-	}
-	else {
-		return (uint16_t)0;
-	}
-}
-
-
 /* Just get 3-GRF Sensor values */
 static int GetRawGRF(GRF_Data_t* grfDataObj)
 {
@@ -261,19 +258,19 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 
 	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
 	// S2 - x,y,z //
-	grfDataObj->voltS2[0] = (float)(PositiveDef(grfDataObj->rawS2[0] - grfDataObj->rawS2offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS2[1] = (float)(PositiveDef(grfDataObj->rawS2[1] - grfDataObj->rawS2offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS2[2] = (float)(PositiveDef(grfDataObj->rawS2[2] - grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
 
 	// S3 - x,y,z //
-	grfDataObj->voltS3[0] = (float)(PositiveDef(grfDataObj->rawS3[0] - grfDataObj->rawS3offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS3[1] = (float)(PositiveDef(grfDataObj->rawS3[1] - grfDataObj->rawS3offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS3[2] = (float)(PositiveDef(grfDataObj->rawS3[2] - grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
 
 	// S4 - x,y,z //
-	grfDataObj->voltS4[0] = (float)(PositiveDef(grfDataObj->rawS4[0] - grfDataObj->rawS4offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS4[1] = (float)(PositiveDef(grfDataObj->rawS4[1] - grfDataObj->rawS4offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS4[2] = (float)(PositiveDef(grfDataObj->rawS4[2] - grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
 
 	return 0;
 }

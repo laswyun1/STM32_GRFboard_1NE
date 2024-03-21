@@ -150,15 +150,8 @@ void InitGaitCtrl(void)
 	DOP_CreateDOD(TASK_ID_GAIT);
 
 	// PDO
-	/* For SUIT PDO setting */
-	DOP_CreatePDO(TASK_ID_GAIT, 	 PDO_ID_GAIT_DEG,		DOP_FLOAT32,	1,    &widmAngleDataObj.degFinal);
-	DOP_CreatePDO(TASK_ID_GAIT, 	 PDO_ID_GAIT_VEL,		DOP_FLOAT32,	1,    &widmAngleDataObj.velFinal);
-	DOP_CreatePDO(TASK_ID_GAIT, 	 PDO_ID_GAIT_GYR_Z,		DOP_FLOAT32,	1,    &widmSensorDataObj.gyrZ[0]);
+	DOP_CreatePDO(TASK_ID_GAIT, PDO_ID_GAIT_QUATERNION,          DOP_INT16,   4,  &q_send[0]);
 
-	// Quaternion //
-	// DOP_CreatePDO(TASK_ID_GAIT, PDO_ID_QUATERNION,          DOP_INT16,   4, &q_send);
-	// DOP_CreateSDO(TASK_ID_GAIT, SDO_ID_IMU_MAG_INVA,        DOP_FLOAT32, SetMagInvAInfo);
-	// DOP_CreateSDO(TASK_ID_GAIT, SDO_ID_IMU_MAG_IRON_ERROR,  DOP_FLOAT32, SetMagIronErrorInfo);
 
 	// SDO
 	DOP_COMMON_SDO_CREATE(TASK_ID_GAIT)
@@ -173,18 +166,13 @@ void InitGaitCtrl(void)
 	InitializeIMU();
 
 	// Quaternion //
-	// InitMagInfo();
+	 InitMagInfo();
+	 EntGetQuaternion();
 
 	/* Initial stage of get angle */
-	ResetDataObj();
-	InitValueSetting(&widmFuzzyDataObj, &widmNormDataObj, &widmGaitDataObj, &widmThresDataObj, widmModuleObj);
-	GetInitialAngle(widmModuleObj);
-
-#ifdef QUATERNION
-	// Quaternion //
-	InitMagInfo();
-	/////////////////////////////////////////////////////////////////////////////////////////////////////
-#endif
+//	ResetDataObj();
+//	InitValueSetting(&widmFuzzyDataObj, &widmNormDataObj, &widmGaitDataObj, &widmThresDataObj, widmModuleObj);
+//	GetInitialAngle(widmModuleObj);
 
 	/* Timer Callback Allocation */
 	if (IOIF_StartTimIT(IOIF_TIM2) > 0) {
@@ -221,7 +209,8 @@ static void StateOff_Run(void)
 
 static void StateStandby_Run(void)
 {
-	RunGetIMUFunction();
+//	RunGetIMUFunction();
+	RunGetQuaternion();
 	gaitCtrlLoopCnt = 0;
 }
 
@@ -306,22 +295,6 @@ static int NodeIDCheck(uint8_t directionSet)
 static void ModelSelection(uint8_t nodeID)
 {
 	switch (nodeID){
-//		case (NODE_ID_LH_SAG):	// LH
-//			ATTACH_CASE_SEL   = WIDM_H10_LEFT;
-//			MODULE_SEL 		  = WIDM_IMUINC_SAM;
-//			break;
-//		case (NODE_ID_RH_SAG):	// RH
-//			ATTACH_CASE_SEL   = WIDM_H10_RIGHT;
-//			MODULE_SEL 		  = WIDM_IMUINC_SAM;
-//			break;
-//		case (NODE_ID_LK):		// LK
-//			ATTACH_CASE_SEL   = WIDM_K10_LEFT;
-//			MODULE_SEL 		  = WIDM_IMU_SAM;
-//			break;
-//		case (NODE_ID_RK):		// RK
-//			ATTACH_CASE_SEL   = WIDM_K10_RIGHT;
-//			MODULE_SEL 		  = WIDM_IMU_SAM;
-//			break;
 		case (NODE_ID_WIDM_R):
 			ATTACH_CASE_SEL   = WIDM_RIGHT_U5;
 			MODULE_SEL 		  = WIDM_IMU_U5;

@@ -55,6 +55,8 @@ extern float incVel;
 
 extern VQF_MagCalib_t vqfMagCalibObj;
 
+extern int16_t q_send[4];
+
 /**
  *------------------------------------------------------------
  *                     FUNCTION PROTOTYPES

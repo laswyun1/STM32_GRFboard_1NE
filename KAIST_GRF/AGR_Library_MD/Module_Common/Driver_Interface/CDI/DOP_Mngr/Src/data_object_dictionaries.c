@@ -193,11 +193,18 @@ void DOP_CreateSDOTable(void)
 	AssembleSDO( &SDOTable [TASK_ID_IMU] [SDO_ID_IMU_MAG_IRON_ERROR],  										DOP_FLOAT32);
 
 	/* Gait Task */
-	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_IMU_GET_STATE],  											DOP_UINT8);
-	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_IMU_SET_STATE],  											DOP_UINT8);
-	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_IMU_GET_ROUTINE],											DOP_UINT8);
-	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_IMU_SET_ROUTINE],											DOP_UINT8);
-	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_IMU_FOR_TEST],											DOP_UINT16);
+	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_GAIT_GET_STATE],  										DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_GAIT_SET_STATE],  										DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_GAIT_GET_ROUTINE],										DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_GAIT_SET_ROUTINE],										DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GAIT] [SDO_ID_GAIT_FOR_TEST],											DOP_UINT16);
+
+	/* GRF Task */
+	AssembleSDO( &SDOTable [TASK_ID_GRF] [SDO_ID_GRF_GET_STATE],  											DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GRF] [SDO_ID_GRF_SET_STATE],  											DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GRF] [SDO_ID_GRF_GET_ROUTINE],											DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GRF] [SDO_ID_GRF_SET_ROUTINE],											DOP_UINT8);
+	AssembleSDO( &SDOTable [TASK_ID_GRF] [SDO_ID_GRF_FOR_TEST],												DOP_UINT16);
 
 	/* System Ctrl Task */
 	AssembleSDO( &SDOTable [TASK_ID_SYSMNGT] [SDO_ID_SYSMNGT_GET_STATE],  									DOP_UINT8);
@@ -305,6 +312,7 @@ void DOP_CreatePDOTable(void)
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GAIT] [PDO_ID_GAIT_DEG_INC],  								DOP_FLOAT32,		1);
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GAIT] [PDO_ID_GAIT_VEL_INC],  								DOP_FLOAT32,		1);
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GAIT] [PDO_ID_GAIT_GYR_Z],  									DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GAIT] [PDO_ID_GAIT_QUATERNION],								DOP_INT16,  		4);
 
 	/* GRF Task */
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2X],  										DOP_FLOAT32,		1);

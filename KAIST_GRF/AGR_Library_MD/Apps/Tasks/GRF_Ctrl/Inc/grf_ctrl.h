@@ -29,17 +29,18 @@
  * @brief Custom data types and structures for the module.
  */
 typedef struct _GRF_Data_t {
-	uint32_t rawS2offset[3];
-	uint32_t rawS3offset[3];
-	uint32_t rawS4offset[3];
+	int32_t rawS2offset[3];
+	int32_t rawS3offset[3];
+	int32_t rawS4offset[3];
 
-	uint32_t rawS2[3];
-	uint32_t rawS3[3];
-	uint32_t rawS4[3];
+	int32_t rawS2[3];
+	int32_t rawS3[3];
+	int32_t rawS4[3];
 
 	float voltS2[3];
 	float voltS3[3];
 	float voltS4[3];
+
 } GRF_Data_t;
 
 
@@ -51,7 +52,7 @@ typedef struct _GRF_Data_t {
  */
 
 
-
+extern GRF_Data_t GrfDataObj;
 
 
 
