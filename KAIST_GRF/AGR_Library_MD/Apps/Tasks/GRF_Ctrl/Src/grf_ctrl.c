@@ -100,9 +100,9 @@ void InitGrfCtrl(void)
 
 	// PDO
 	/* For SUIT PDO setting */
-//	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_DEG,		DOP_FLOAT32,	1,    &widmAngleDataObj.degFinal);
-//	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_VEL,		DOP_FLOAT32,	1,    &widmAngleDataObj.velFinal);
-//	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_GYR_Z,		DOP_FLOAT32,	1,    &widmSensorDataObj.gyrZ[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[2]);
 
 	// SDO
 	DOP_COMMON_SDO_CREATE(TASK_ID_GRF)
