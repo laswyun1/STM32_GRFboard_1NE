@@ -32,6 +32,43 @@ uint8_t grfCtrlState = 0;
 static uint8_t grfBoardNodeID;
 
 
+float Calib_0903[3][3] = {{1.0728, -0.00330, -0.04320},
+		{0.06095, 1.10683, -0.02624},
+		{0.01283, 0.01208, 1.00197}};
+float Calib_0904[3][3] = {{1.06284, -0.12484, -0.01295},
+		{0.12809, 1.05286, 0.05660},
+		{0.00172, -0.00291, 1.00636}};
+float Calib_0905[3][3] = {{1.05861, -0.02645, -0.00525},
+		{-0.00134, 1.09504, 0.00598},
+		{0.01172, 0.00004, 1.00222}};
+float Calib_0906[3][3] = {{1.06449, -0.06041, -0.01800},
+		{0.02641, 1.12496, 0.00915},
+		{0.00552, -0.00136, 0.99892}};
+float Calib_0907[3][3] = {{1.04797, -0.00971, -0.00643},
+		{0.00106, 1.11383, -0.00350},
+		{0.00880, -0.01241, 0.99442}};
+float Calib_0908[3][3] = {{1.07688, -0.10547, 0.00026},
+		{0.02277, 1.08720, 0.00002},
+		{0.00655, 0.00128, 1.00846}};
+float Calib_0909[3][3] = {{1.09278, -0.03905, 0.01048},
+		{0.04087, 1.06463, 0.01664},
+		{0.01168, 0.00382, 1.00054}};
+float Calib_1004[3][3] = {{1.06967, -0.06493, 0.01491},
+		{0.03158, 1.10222, 0.00448},
+		{-0.00064, 0.02465, 1.00046}};
+float Calib_1005[3][3] = {{1.03857, -0.06545, 0.00511},
+		{0.08713, 1.14248, 0.02753},
+		{-0.00210, 0.00409, 1.00105}};
+float Calib_1006[3][3] = {{1.06996, -0.02724, -0.02762},
+		{0.01611, 1.09007, -0.02448},
+		{0.01165, 0.00692, 0.99176}};
+
+float strainS2[3] = {0};
+float strainS3[3] = {0};
+float strainS4[3] = {0};
+
+
+
 /**
  *------------------------------------------------------------
  *                 STATIC FUNCTION PROTOTYPES
@@ -100,17 +137,17 @@ void InitGrfCtrl(void)
 
 	// PDO
 	/* For SUIT PDO setting */
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[0]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[1]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS2[2]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[2]);
 
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS3[0]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS3[1]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS3[2]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3X,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Z,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[2]);
 
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4X,		DOP_FLOAT32,	1,    &GrfDataObj.voltS4[0]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Y,		DOP_FLOAT32,	1,    &GrfDataObj.voltS4[1]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Z,		DOP_FLOAT32,	1,    &GrfDataObj.voltS4[2]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4X,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Z,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[2]);
 
 	// SDO
 	DOP_COMMON_SDO_CREATE(TASK_ID_GRF)
@@ -271,6 +308,33 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
 	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
 	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+
+
+
+	/* Calculate Voltage to Strain */
+	strainS2[0] = grfDataObj->voltS2[0] * Volt2strain;
+	strainS2[1] = grfDataObj->voltS2[0] * Volt2strain;
+	strainS2[2] = grfDataObj->voltS2[0] * Volt2strain;
+	strainS3[0] = grfDataObj->voltS3[0] * Volt2strain;
+	strainS3[1] = grfDataObj->voltS3[0] * Volt2strain;
+	strainS3[2] = grfDataObj->voltS3[0] * Volt2strain;
+	strainS4[0] = grfDataObj->voltS4[0] * Volt2strain;
+	strainS4[1] = grfDataObj->voltS4[0] * Volt2strain;
+	strainS4[2] = grfDataObj->voltS4[0] * Volt2strain;
+
+
+
+	/* Calculate the Force (Choose proper CalibMatrix */
+	for (uint8_t i = 0; i < 3; i++){
+		grfDataObj->F_S2[i] = 0;
+		grfDataObj->F_S3[i] = 0;
+		grfDataObj->F_S4[i] = 0;
+		for (uint8_t j = 0; j < 3; j++){
+			grfDataObj->F_S2[i] += Calib_0909[i][j] * strainS2[j];
+			grfDataObj->F_S3[i] += Calib_0907[i][j] * strainS3[j];
+			grfDataObj->F_S4[i] += Calib_0906[i][j] * strainS4[j];
+		}
+	}
 
 	return 0;
 }

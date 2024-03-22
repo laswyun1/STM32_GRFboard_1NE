@@ -21,6 +21,7 @@
  * @brief Directives and macros for readability and efficiency.
  */
 
+#define Volt2strain    2000 * 1000 / 3 / 1100; // Gain = 1100
 
 /**
  *------------------------------------------------------------
@@ -41,7 +42,13 @@ typedef struct _GRF_Data_t {
 	float voltS3[3];
 	float voltS4[3];
 
+	float F_S2[3];
+	float F_S3[3];
+	float F_S4[3];
+
+
 } GRF_Data_t;
+
 
 
 /**
