@@ -313,14 +313,14 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 
 	/* Calculate Voltage to Strain */
 	strainS2[0] = grfDataObj->voltS2[0] * Volt2strain;
-	strainS2[1] = grfDataObj->voltS2[0] * Volt2strain;
-	strainS2[2] = grfDataObj->voltS2[0] * Volt2strain;
+	strainS2[1] = grfDataObj->voltS2[1] * Volt2strain;
+	strainS2[2] = grfDataObj->voltS2[2] * Volt2strain;
 	strainS3[0] = grfDataObj->voltS3[0] * Volt2strain;
-	strainS3[1] = grfDataObj->voltS3[0] * Volt2strain;
-	strainS3[2] = grfDataObj->voltS3[0] * Volt2strain;
+	strainS3[1] = grfDataObj->voltS3[1] * Volt2strain;
+	strainS3[2] = grfDataObj->voltS3[2] * Volt2strain;
 	strainS4[0] = grfDataObj->voltS4[0] * Volt2strain;
-	strainS4[1] = grfDataObj->voltS4[0] * Volt2strain;
-	strainS4[2] = grfDataObj->voltS4[0] * Volt2strain;
+	strainS4[1] = grfDataObj->voltS4[1] * Volt2strain;
+	strainS4[2] = grfDataObj->voltS4[2] * Volt2strain;
 
 
 
