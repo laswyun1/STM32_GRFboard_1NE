@@ -81,7 +81,7 @@ static void StateEnable_Ext();
 static void StateError_Run();
 
 /* ------------------- READ NODE ID ------------------- */
-static uint8_t Read_Node_ID(uint8_t directionSet);
+static uint8_t Read_Node_ID();
 
 /* ------------------- CONVERT BYTE TO LENGTH ------------------- */
 static DOP_Header_t Get_Header(uint8_t* t_byte_arr);
@@ -138,7 +138,7 @@ void InitMsgHdlr()
     /*Task Init*/
     InitTask(&msg_hdlr_task);
 
-    GRF_node_id = Read_Node_ID(0);		// 0:RIGHT, 1:LEFT
+    GRF_node_id = Read_Node_ID();		// 0:RIGHT, 1:LEFT
     ori_node = 0x00;
 
     /* Communication Init */
@@ -263,15 +263,16 @@ static void StateError_Run()
 }
 
 /* ------------------- READ NODE ID ------------------- */
-static uint8_t Read_Node_ID(uint8_t directionSet)
+static uint8_t Read_Node_ID(void)
 {
 	uint8_t nodeID = 0;
-	if (directionSet == 0){			// RIGHT
-		nodeID = 14;
-	}
-	else if (directionSet == 1){ 	// LEFT
-		nodeID = 15;
-	}
+#ifdef GRF_RIGHT
+	nodeID = 14;
+#endif
+
+#ifdef GRF_LEFT
+	nodeID = 15;
+#endif
 	return nodeID;
 }
 

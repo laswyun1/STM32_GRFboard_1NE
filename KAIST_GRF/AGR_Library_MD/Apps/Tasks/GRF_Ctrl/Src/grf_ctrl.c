@@ -88,7 +88,7 @@ static void StateEnable_Ext(void);
 static void StateError_Run(void);
 
 /* ------------------- INITIALIZATION ------------------- */
-static int GRFNodeIDCheck(uint8_t directionSet);
+static int GRFNodeIDCheck(void);
 
 /* ------------------- ROUTINE ------------------- */
 //static int RunGetIMUFunction(void);
@@ -120,7 +120,7 @@ void InitGrfCtrl(void)
 	}
 
     /* Checking Node ID */
-    grfBoardNodeID = GRFNodeIDCheck(0);			// 0 : Right, 1 : LEFT
+    grfBoardNodeID = GRFNodeIDCheck();			// 0 : Right, 1 : LEFT
 
 	/* State Definition */
 	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_OFF,      NULL,				StateOff_Run,       NULL,         		 true);
@@ -137,17 +137,33 @@ void InitGrfCtrl(void)
 
 	// PDO
 	/* For SUIT PDO setting */
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[0]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[1]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[2]);
+#ifdef GRF_RIGHT
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[2]);
 
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3X,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[0]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[1]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Z,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[2]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3X_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Y_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Z_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[2]);
 
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4X,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[0]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[1]);
-	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Z,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[2]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4X_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Y_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Z_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[2]);
+#endif
+
+#ifdef GRF_LEFT
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2X_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Y_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S2Z_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S2[2]);
+
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3X_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Y_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S3Z_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S3[2]);
+
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4X_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[0]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Y_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[1]);
+	DOP_CreatePDO(TASK_ID_GRF, 	 PDO_ID_GRF_S4Z_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[2]);
+#endif
 
 	// SDO
 	DOP_COMMON_SDO_CREATE(TASK_ID_GRF)
@@ -261,15 +277,16 @@ static void StateError_Run(void)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /* Module & Mode Selection Functions */
-static int GRFNodeIDCheck(uint8_t directionSet)
+static int GRFNodeIDCheck(void)
 {
 	int nodeID = 0;
-	if (directionSet == 0){			// RIGHT GRF
-		nodeID = 14;
-	}
-	else if (directionSet == 1){	// LEFT GRF
-		nodeID = 15;
-	}
+#ifdef GRF_RIGHT
+	nodeID = 14;
+#endif
+
+#ifdef GRF_LEFT
+	nodeID = 15;
+#endif
 	return nodeID;
 }
 

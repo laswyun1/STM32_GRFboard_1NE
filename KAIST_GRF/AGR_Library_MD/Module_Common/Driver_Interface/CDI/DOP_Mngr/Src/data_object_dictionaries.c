@@ -315,15 +315,25 @@ void DOP_CreatePDOTable(void)
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GAIT] [PDO_ID_GAIT_QUATERNION],								DOP_INT16,  		4);
 
 	/* GRF Task */
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2X],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2Y],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2Z],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3X],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3Y],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3Z],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4X],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4Y],  										DOP_FLOAT32,		1);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4Z],  										DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2X_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2Y_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2Z_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3X_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3Y_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3Z_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4X_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4Y_RIGHT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4Z_RIGHT],  								DOP_FLOAT32,		1);
+
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2X_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2Y_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S2Z_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3X_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3Y_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S3Z_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4X_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4Y_LEFT],  								DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_GRF] [PDO_ID_GRF_S4Z_LEFT],  								DOP_FLOAT32,		1);
 
 	/* System Ctrl Task */
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_SYSMNGT] [PDO_ID_SYSTEM_VOLT],								DOP_FLOAT32,  		1);
