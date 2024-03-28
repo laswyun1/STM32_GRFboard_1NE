@@ -21,6 +21,7 @@
 #include "adc.h"
 #include "dcache.h"
 #include "fdcan.h"
+#include "flash.h"
 #include "gpdma.h"
 #include "i2c.h"
 #include "icache.h"
@@ -33,11 +34,12 @@
 #include "gait_ctrl.h"
 #include "grf_ctrl.h"
 #include "msg_hdlr.h"
+#include "module.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#define READ_FLASH_ARRAY_SIZE  32 	// 128 Byte Aligned
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -60,7 +62,8 @@
 void SystemClock_Config(void);
 static void MPU_Config(void);
 /* USER CODE BEGIN PFP */
-
+void SaveProperties();
+void DownloadProperties();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -109,6 +112,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_ADC1_Init();
+  MX_FLASH_Init();
   /* USER CODE BEGIN 2 */
 
   DOP_CreateSDOTable();
@@ -116,6 +120,11 @@ int main(void)
 
   // Init Indicator - BLUE LED //
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_15, GPIO_PIN_SET);
+
+  // Bring the Flash Memory //
+  DownloadProperties();
+
+  MS_enum = IDLE;
 
   InitGrfCtrl();
   InitGaitCtrl();
@@ -127,6 +136,18 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	    if(MS_enum == IDLE)                         continue;
+//	    else if(MS_enum == UPLOAD_PROPERTIES)       UploadProperties();
+	    else if(MS_enum == SAVE_PROPERTIES)         SaveProperties();
+	    else if(MS_enum == DOWNLOAD_PROPERTIES)     DownloadProperties();
+//	    else if(MS_enum == ELECTRICAL_SYSTEM_ID)    Cal_Elec_System_ID_Batch();
+//	    else if(MS_enum == BEMF_ID)                 Send_Elec_BEMF_Value();
+//	    else if(MS_enum == CURRENT_BANDWIDTH_CHECK) Send_Elec_Bandwidth_Data();
+//	    else if(MS_enum == AUTO_TUNING)             Tune_Gain();
+//	    else if(MS_enum == ADV_FRICTION_ID)         Send_Advanced_Friction_ID_Data();
+//	    else if(MS_enum == CAL_FRICTION_LUT)        Cal_Friction_LUT();
+	    else                                        continue;
+	    MS_enum = IDLE;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -189,6 +210,93 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void SaveProperties()
+{
+	uint32_t writeAddr = 0;
+	int32_t memArr1[4] = {0};
+	int32_t memArr2[4] = {0};
+	int32_t memArr3[4] = {0};
+
+	IOIF_EraseFlash(IOIF_FLASH_START_USER_ADDR, IOIF_ERASE_ONE_SECTOR);
+	writeAddr = IOIF_FLASH_START_USER_ADDR;
+
+	/* Set the offset */
+#ifdef GRF_LEFT
+	GrfDataObj.rawS2offset[0] = 200;
+	GrfDataObj.rawS2offset[1] = -20;
+	GrfDataObj.rawS2offset[2] = 40;
+
+	GrfDataObj.rawS3offset[0] = 50;
+	GrfDataObj.rawS3offset[1] = 80;
+	GrfDataObj.rawS3offset[2] = 1230;
+
+	GrfDataObj.rawS4offset[0] = 1234;
+	GrfDataObj.rawS4offset[1] = -2392;
+	GrfDataObj.rawS4offset[2] = -4321;
+#endif
+#ifdef GRF_RIGHT
+	GrfDataObj.rawS2offset[0] = 0;
+	GrfDataObj.rawS2offset[1] = 0;
+	GrfDataObj.rawS2offset[2] = 0;
+
+	GrfDataObj.rawS3offset[0] = 0;
+	GrfDataObj.rawS3offset[1] = 0;
+	GrfDataObj.rawS3offset[2] = 0;
+
+	GrfDataObj.rawS3offset[0] = 0;
+	GrfDataObj.rawS3offset[1] = 0;
+	GrfDataObj.rawS3offset[2] = 0;
+#endif
+
+	/* Save Flash memory  */
+	memcpy(&memArr1[0], &GrfDataObj.rawS2offset[0],     	   sizeof(GrfDataObj.rawS2offset[0]));
+	memcpy(&memArr1[1], &GrfDataObj.rawS2offset[1],     	   sizeof(GrfDataObj.rawS2offset[1]));
+	memcpy(&memArr1[2], &GrfDataObj.rawS2offset[2],     	   sizeof(GrfDataObj.rawS2offset[2]));
+	memcpy(&memArr1[3], &GrfDataObj.rawS3offset[0],     	   sizeof(GrfDataObj.rawS3offset[0]));
+
+	IOIF_WriteFlash(writeAddr, memArr1);
+	writeAddr += 16;
+
+
+	memcpy(&memArr2[0], &GrfDataObj.rawS3offset[1],     	   sizeof(GrfDataObj.rawS3offset[1]));
+	memcpy(&memArr2[1], &GrfDataObj.rawS3offset[2],     	   sizeof(GrfDataObj.rawS3offset[2]));
+	memcpy(&memArr2[2], &GrfDataObj.rawS4offset[0],     	   sizeof(GrfDataObj.rawS4offset[0]));
+	memcpy(&memArr2[3], &GrfDataObj.rawS4offset[1],     	   sizeof(GrfDataObj.rawS4offset[1]));
+
+	IOIF_WriteFlash(writeAddr, memArr2);
+	writeAddr += 16;
+
+
+	memcpy(&memArr3[0], &GrfDataObj.rawS4offset[2],     	   sizeof(GrfDataObj.rawS2offset[0]));
+
+	IOIF_WriteFlash(writeAddr, memArr3);
+	writeAddr += 16;
+
+
+	return;
+}
+
+
+void DownloadProperties()
+{
+  uint32_t readAddr = IOIF_FLASH_START_USER_ADDR;
+
+  /* Download Flash Memory */
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS2offset[0], 	  IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS2offset[1],    IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS2offset[2], 	  IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS3offset[0], 	  IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS3offset[1],    IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS3offset[2], 	  IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS4offset[0], 	  IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS4offset[1],    IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+
+  for(int i = 0; i<500; ++i) {}
+
+  IOIF_ReadFlash(readAddr, &GrfDataObj.rawS4offset[2],    IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
+}
+
 
 /* USER CODE END 4 */
 

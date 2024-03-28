@@ -14,6 +14,7 @@
 #include "data_object_common.h"
 #include "ioif_adc_common.h"
 
+#include "ioif_flash_common.h"
 /**
  *-----------------------------------------------------------
  *              MACROS AND PREPROCESSOR DIRECTIVES
@@ -60,7 +61,6 @@ typedef struct _GRF_Data_t {
 
 
 extern GRF_Data_t GrfDataObj;
-
 
 
 /**
