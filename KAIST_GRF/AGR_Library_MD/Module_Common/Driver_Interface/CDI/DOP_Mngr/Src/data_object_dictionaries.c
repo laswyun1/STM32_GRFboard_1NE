@@ -349,6 +349,8 @@ void DOP_CreatePDOTable(void)
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_S4X_LEFT],  							DOP_FLOAT32,		1);
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_S4Y_LEFT],  							DOP_FLOAT32,		1);
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_S4Z_LEFT],  							DOP_FLOAT32,		1);
+
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_LOOPCNT],  							DOP_FLOAT32,		1);
 }
 
 

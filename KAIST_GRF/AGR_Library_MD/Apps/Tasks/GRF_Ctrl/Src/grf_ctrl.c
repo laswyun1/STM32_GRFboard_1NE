@@ -176,6 +176,8 @@ void InitGrfCtrl(void)
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_S4X_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[0]);
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_S4Y_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[1]);
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_S4Z_RIGHT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[2]);
+
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_LOOPCNT,			DOP_UINT32,		1,    &grfCtrlLoopCnt);
 #endif
 
 #ifdef GRF_LEFT
@@ -190,6 +192,8 @@ void InitGrfCtrl(void)
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_S4X_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[0]);
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_S4Y_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[1]);
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_S4Z_LEFT,		DOP_FLOAT32,	1,    &GrfDataObj.F_S4[2]);
+
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_LOOPCNT,			DOP_UINT32,		1,    &grfCtrlLoopCnt);
 #endif
 
 	// SDO
@@ -276,7 +280,8 @@ static void StateOff_Run(void)
 
 static void StateStandby_Run(void)
 {
-	GetRawGRF(&GrfDataObj);
+//	GetRawGRF(&GrfDataObj);
+	StateTransition(&grfCtrlTask.stateMachine, TASK_STATE_ENABLE);
 	grfCtrlLoopCnt = 0;
 }
 
@@ -289,6 +294,7 @@ static void StateEnable_Ent(void)
 static void StateEnable_Run(void)
 {
 	RunRoutines(&grfCtrlTask.routine);
+	GetRawGRF(&GrfDataObj);
 	grfCtrlLoopCnt++;
 }
 
