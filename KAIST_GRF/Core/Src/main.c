@@ -127,7 +127,7 @@ int main(void)
   MS_enum = IDLE;
 
   InitGrfCtrl();
-  InitGaitCtrl();
+//  InitGaitCtrl();
   InitMsgHdlr();
 
   /* USER CODE END 2 */

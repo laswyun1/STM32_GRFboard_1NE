@@ -4,6 +4,7 @@
 #include "module.h"
 
 #include <stdbool.h>
+#include <math.h>
 
 #include "ioif_tim_common.h"
 #include "ioif_gpio_common.h"

@@ -218,8 +218,8 @@ void InitGrfCtrl(void)
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FL_filt[0]);
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_XYZ,			DOP_FLOAT32,	    3,    &GrfDataObj.F_Ba_filt[0]);
 
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF,					DOP_FLOAT32,	    3,    &GrfDataObj.GRF_X);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP,					DOP_FLOAT32,	    2,    &GrfDataObj.COP_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP,					DOP_FLOAT32,	    1,    &GrfDataObj.COP_X);
 
 /*
 #ifdef GRF_RIGHT
