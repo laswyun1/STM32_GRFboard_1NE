@@ -18,8 +18,8 @@
 
 //******* IF GRFB *******//
 #define KAIST_GRF_BOARD_ENABLED
-#define GRF_LEFT
-//#define GRF_RIGHT
+//#define GRF_LEFT
+#define GRF_RIGHT
 
 /* ------------------- Select CM or MD or WIDM For WIDM(Gait Ctrl) ------------------- */
 #if defined(WALKON5_CM_ENABLED) || defined(L30_CM_ENABLED) || defined(SUIT_MINICM_ENABLED)

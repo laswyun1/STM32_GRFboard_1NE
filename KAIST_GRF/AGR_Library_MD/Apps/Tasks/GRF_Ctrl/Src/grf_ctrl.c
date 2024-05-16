@@ -202,24 +202,28 @@ void InitGrfCtrl(void)
 	/* For PDO setting */
 	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_LOOP_CNT,			DOP_UINT32,	1,    &grfCtrlLoopCnt);
 
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_X,		DOP_FLOAT32,	1,    &GrfDataObj.F_FM_filt[0]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_FM_filt[1]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_Z,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FM_filt[2]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_X,		DOP_FLOAT32,	1,    &GrfDataObj.F_FM_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_Y,		DOP_FLOAT32,	1,    &GrfDataObj.F_FM_filt[1]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_Z,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FM_filt[2]);
+//
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_X,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_Y,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[1]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_Z,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[2]);
+//
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_X,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Y,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[1]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Z,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[2]);
+//
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FM_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FL_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_XYZ,			DOP_FLOAT32,	    3,    &GrfDataObj.F_Ba_filt[0]);
 
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_X,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[0]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_Y,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[1]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_Z,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[2]);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_X,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_Y,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_Y);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_Z,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_Z);
 
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_X,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[0]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Y,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[1]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Z,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[2]);
-
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FM_filt[0]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FL_filt[0]);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_XYZ,			DOP_FLOAT32,	    3,    &GrfDataObj.F_Ba_filt[0]);
-
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_X);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP,					DOP_FLOAT32,	    1,    &GrfDataObj.COP_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP_X,					DOP_FLOAT32,	    1,    &GrfDataObj.COP_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP_Y,					DOP_FLOAT32,	    1,    &GrfDataObj.COP_Y);
 
 /*
 #ifdef GRF_RIGHT
@@ -408,6 +412,39 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 	grfDataObj->rawS4[0] = rawGRF[6];
 	grfDataObj->rawS4[1] = rawGRF[7];
 	grfDataObj->rawS4[2] = rawGRF[8];
+
+
+
+//	/* For Low Pass Filtering */
+//	grfDataObj->rawS2LPF[0] = 0.97*grfDataObj->rawS2LPF[0] + 0.03*grfDataObj->rawS2[0];
+//	grfDataObj->rawS2LPF[1] = 0.97*grfDataObj->rawS2LPF[1] + 0.03*grfDataObj->rawS2[1];
+//	grfDataObj->rawS2LPF[2] = 0.97*grfDataObj->rawS2LPF[2] + 0.03*grfDataObj->rawS2[2];
+//
+//	grfDataObj->rawS3LPF[0] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
+//	grfDataObj->rawS3LPF[1] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
+//	grfDataObj->rawS3LPF[2] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
+//
+//	grfDataObj->rawS4LPF[0] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
+//	grfDataObj->rawS4LPF[1] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
+//	grfDataObj->rawS4LPF[2] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
+//
+//	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
+//	// S2 - x,y,z //
+//	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2LPF[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2LPF[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2LPF[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+//
+//	// S3 - x,y,z //
+//	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3LPF[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3LPF[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3LPF[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+//
+//	// S4 - x,y,z //
+//	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4LPF[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4LPF[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4LPF[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+
+
 
 
 	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */

@@ -344,8 +344,11 @@ void DOP_CreatePDOTable(void)
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_FRONT_MEDIAL_XYZ],  					DOP_FLOAT32,		3);
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_FRONT_LATERAL_XYZ],  					DOP_FLOAT32,		3);
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_BACK_XYZ],  							DOP_FLOAT32,		3);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_GRF],  							    DOP_FLOAT32,		3);
-	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_COP],  							    DOP_FLOAT32,		3);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_GRF_X],  							    DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_GRF_Y],  							    DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_GRF_Z],  							    DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_COP_X],  							    DOP_FLOAT32,		1);
+	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_COP_Y],  							    DOP_FLOAT32,		1);
 
 	/*
 	AssemblePDO( (PDOInfo_t*)PDOTable [TASK_ID_EXTDEV] [PDO_ID_EXTDEV_S2X_RIGHT],  							DOP_FLOAT32,		1);

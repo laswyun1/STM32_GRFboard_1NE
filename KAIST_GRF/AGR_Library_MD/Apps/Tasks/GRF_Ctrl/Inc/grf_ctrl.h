@@ -40,6 +40,10 @@ typedef struct _GRF_Data_t {
 	int32_t rawS3[3];
 	int32_t rawS4[3];
 
+	int32_t rawS2LPF[3];
+	int32_t rawS3LPF[3];
+	int32_t rawS4LPF[3];
+
 	float voltS2[3];
 	float voltS3[3];
 	float voltS4[3];
