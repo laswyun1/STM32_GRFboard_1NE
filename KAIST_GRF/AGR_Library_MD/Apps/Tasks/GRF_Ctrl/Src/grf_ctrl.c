@@ -186,8 +186,8 @@ void InitGrfCtrl(void)
     grfBoardNodeID = GRFNodeIDCheck();			// 0 : Right, 1 : LEFT
 
 	/* State Definition */
-	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_OFF,      NULL,				StateOff_Run,       NULL,         		 false);
-	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_STANDBY,  NULL,				StateStandby_Run,	NULL,         		 true);
+	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_OFF,      NULL,				StateOff_Run,       NULL,         		 true);
+	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_STANDBY,  NULL,				StateStandby_Run,	NULL,         		 false);
 	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_ENABLE,   StateEnable_Ent,	StateEnable_Run, 	StateEnable_Ext,	 false);
 	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_ERROR,    NULL,				StateError_Run,    	NULL,				 false);
 
@@ -302,50 +302,50 @@ static void StateStandby_Run(void)
 //	GetRawGRF(&GrfDataObj);
 
 	/* Calibrate offset of the GRF sensors */
-//	static uint16_t calibNum = 0;
-//	static uint32_t ArrOffset[9] = {0};
-//	static uint8_t errCnt = 0;
-//
-//	if (calibNum < 2000) {
-//		ArrOffset[0] += rawGRF[0];
-//		ArrOffset[1] += rawGRF[1];
-//		ArrOffset[2] += rawGRF[2];
-//
-//		ArrOffset[3] += rawGRF[3];
-//		ArrOffset[4] += rawGRF[4];
-//		ArrOffset[5] += rawGRF[5];
-//
-//		ArrOffset[6] += rawGRF[6];
-//		ArrOffset[7] += rawGRF[7];
-//		ArrOffset[8] += rawGRF[8];
-//
-//		calibNum++;
-//	}
-//
-//	else if (calibNum == 2000){
-//		for (uint8_t i = 0; i < 9; i++) {
-//			if (ArrOffset[i] / 2000 > 32768) {
-//				calibNum = 0;
-//				errCnt++;
-//			}
-//		}
-//
-//		if (errCnt == 0){
-//			GrfDataObj.rawS2offset[0] = ArrOffset[0] / 2000;
-//			GrfDataObj.rawS2offset[1] = ArrOffset[1] / 2000;
-//			GrfDataObj.rawS2offset[2] = ArrOffset[2] / 2000;
-//
-//			GrfDataObj.rawS3offset[0] = ArrOffset[3] / 2000;
-//			GrfDataObj.rawS3offset[1] = ArrOffset[4] / 2000;
-//			GrfDataObj.rawS3offset[2] = ArrOffset[5] / 2000;
-//
-//			GrfDataObj.rawS4offset[0] = ArrOffset[6] / 2000;
-//			GrfDataObj.rawS4offset[1] = ArrOffset[7] / 2000;
-//			GrfDataObj.rawS4offset[2] = ArrOffset[8] / 2000;
-//
-//			StateTransition(&grfCtrlTask.stateMachine, TASK_STATE_ENABLE);
-//		}
-//	}
+	static uint16_t calibNum = 0;
+	static uint32_t ArrOffset[9] = {0};
+	static uint8_t errCnt = 0;
+
+	if (calibNum < 2000) {
+		ArrOffset[0] += rawGRF[0];
+		ArrOffset[1] += rawGRF[1];
+		ArrOffset[2] += rawGRF[2];
+
+		ArrOffset[3] += rawGRF[3];
+		ArrOffset[4] += rawGRF[4];
+		ArrOffset[5] += rawGRF[5];
+
+		ArrOffset[6] += rawGRF[6];
+		ArrOffset[7] += rawGRF[7];
+		ArrOffset[8] += rawGRF[8];
+
+		calibNum++;
+	}
+
+	else if (calibNum == 2000){
+		for (uint8_t i = 0; i < 9; i++) {
+			if (ArrOffset[i] / 2000 > 32768) {
+				calibNum = 0;
+				errCnt++;
+			}
+		}
+
+		if (errCnt == 0){
+			GrfDataObj.rawS2offset[0] = ArrOffset[0] / 2000;
+			GrfDataObj.rawS2offset[1] = ArrOffset[1] / 2000;
+			GrfDataObj.rawS2offset[2] = ArrOffset[2] / 2000;
+
+			GrfDataObj.rawS3offset[0] = ArrOffset[3] / 2000;
+			GrfDataObj.rawS3offset[1] = ArrOffset[4] / 2000;
+			GrfDataObj.rawS3offset[2] = ArrOffset[5] / 2000;
+
+			GrfDataObj.rawS4offset[0] = ArrOffset[6] / 2000;
+			GrfDataObj.rawS4offset[1] = ArrOffset[7] / 2000;
+			GrfDataObj.rawS4offset[2] = ArrOffset[8] / 2000;
+
+			StateTransition(&grfCtrlTask.stateMachine, TASK_STATE_ENABLE);
+		}
+	}
 
 //	StateTransition(&grfCtrlTask.stateMachine, TASK_STATE_ENABLE);
 	grfCtrlLoopCnt = 0;
@@ -361,56 +361,6 @@ static void StateEnable_Run(void)
 {
 	RunRoutines(&grfCtrlTask.routine);
 //	GetRawGRF(&GrfDataObj);
-
-	static uint16_t calibNum = 0;
-	static uint32_t ArrOffset[9] = {0};
-	static uint8_t errCnt = 0;
-	static uint8_t homingOK = 0;
-
-	if (homingOK == 0){
-		if (calibNum < 2000) {
-			ArrOffset[0] += rawGRF[0];
-			ArrOffset[1] += rawGRF[1];
-			ArrOffset[2] += rawGRF[2];
-
-			ArrOffset[3] += rawGRF[3];
-			ArrOffset[4] += rawGRF[4];
-			ArrOffset[5] += rawGRF[5];
-
-			ArrOffset[6] += rawGRF[6];
-			ArrOffset[7] += rawGRF[7];
-			ArrOffset[8] += rawGRF[8];
-
-			calibNum++;
-		}
-
-		else if (calibNum == 2000){
-			for (uint8_t i = 0; i < 9; i++) {
-				if (ArrOffset[i] / 2000 > 32768) {
-					calibNum = 0;
-					errCnt++;
-				}
-			}
-
-			if (errCnt == 0){
-				GrfDataObj.rawS2offset[0] = ArrOffset[0] / 2000;
-				GrfDataObj.rawS2offset[1] = ArrOffset[1] / 2000;
-				GrfDataObj.rawS2offset[2] = ArrOffset[2] / 2000;
-
-				GrfDataObj.rawS3offset[0] = ArrOffset[3] / 2000;
-				GrfDataObj.rawS3offset[1] = ArrOffset[4] / 2000;
-				GrfDataObj.rawS3offset[2] = ArrOffset[5] / 2000;
-
-				GrfDataObj.rawS4offset[0] = ArrOffset[6] / 2000;
-				GrfDataObj.rawS4offset[1] = ArrOffset[7] / 2000;
-				GrfDataObj.rawS4offset[2] = ArrOffset[8] / 2000;
-			}
-			calibNum = 5000;
-			homingOK = 1;
-		}
-	}
-
-
 
 	GetRawGRF(&GrfDataObj);
 	Force_Labeling(&GrfDataObj);
