@@ -54,23 +54,23 @@ typedef struct _GRF_Data_t {
 
 	float F_FM_filt[3];
 	float F_FL_filt[3];
-	float F_Ba_filt[3];
+	float F_BA_filt[3];
 
 	float F_FM_filt_f[3];
 	float F_FL_filt_f[3];
-	float F_Ba_filt_f[3];
+	float F_BA_filt_f[3];
 
 	float F_FM_f[3];
 	float F_FL_f[3];
-	float F_Ba_f[3];
+	float F_BA_f[3];
 
 	float F_FM_prev[3];
 	float F_FL_prev[3];
-	float F_Ba_prev[3];
+	float F_BA_prev[3];
 
 	float F_FM_LPF[3];
 	float F_FL_LPF[3];
-	float F_Ba_LPF[3];
+	float F_BA_LPF[3];
 
 	float F_FM_LPF_X;
 	float F_FM_LPF_Y;
@@ -80,17 +80,17 @@ typedef struct _GRF_Data_t {
 	float F_FL_LPF_Y;
 	float F_FL_LPF_Z;
 
-	float F_Ba_LPF_X;
-	float F_Ba_LPF_Y;
-	float F_Ba_LPF_Z;
+	float F_BA_LPF_X;
+	float F_BA_LPF_Y;
+	float F_BA_LPF_Z;
 
 	float F_FM_norm;
 	float F_FL_norm;
-	float F_Ba_norm;
+	float F_BA_norm;
 
 	float F_FM[3];
 	float F_FL[3];
-	float F_Ba[3];
+	float F_BA[3];
 
 	float Force_FM_X;
 	float Force_FM_Y;

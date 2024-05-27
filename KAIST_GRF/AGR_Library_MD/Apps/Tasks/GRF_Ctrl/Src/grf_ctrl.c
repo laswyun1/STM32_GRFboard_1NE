@@ -27,9 +27,9 @@ static uint16_t* rawGRF = {0}; 	 // 0,1,2 => S2, 3,4,5 => S3, 6,7,8 => S4
 static uint32_t grfCtrlLoopCnt;
 static float grfCtrlTimeElap;
 
-uint8_t grfCtrlState = 0;
 
-static uint8_t grfBoardNodeID;
+static uint8_t grfBoardNodeID = 0;
+static uint8_t grfSelectionErr = 0;
 
 
 float Calib_0903[3][3] = {{1.0728, -0.00330, -0.04320},
@@ -159,7 +159,7 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj);
 static int Force_Labeling(GRF_Data_t* grfDataObj);
 static int Get_Total_GRF(GRF_Data_t* grfDataObj);
 static int Get_Total_COP(GRF_Data_t* grfDataObj);
-static int sign(double x);
+static int sign(float x);
 /* ------------------- SDO CALLBACK ------------------- */
 //static void SetMagIronErrorInfo(DOP_SDOArgs_t* t_req, DOP_SDOArgs_t* t_res);
 
@@ -183,7 +183,7 @@ void InitGrfCtrl(void)
 	}
 
     /* Checking Node ID */
-    grfBoardNodeID = GRFNodeIDCheck();			// 0 : Right, 1 : LEFT
+    grfBoardNodeID = GRFNodeIDCheck();			// 14:Right, 15:LEFT
 
 	/* State Definition */
 	TASK_CREATE_STATE(&grfCtrlTask, TASK_STATE_OFF,      NULL,				StateOff_Run,       NULL,         		 true);
@@ -210,20 +210,20 @@ void InitGrfCtrl(void)
 //	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_Y,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[1]);
 //	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_Z,		DOP_FLOAT32,	    1,    &GrfDataObj.F_FL_filt[2]);
 //
-//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_X,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[0]);
-//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Y,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[1]);
-//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Z,				DOP_FLOAT32,	    1,    &GrfDataObj.F_Ba_filt[2]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_X,				DOP_FLOAT32,	    1,    &GrfDataObj.F_BA_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Y,				DOP_FLOAT32,	    1,    &GrfDataObj.F_BA_filt[1]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_Z,				DOP_FLOAT32,	    1,    &GrfDataObj.F_BA_filt[2]);
 //
 //	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_MEDIAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FM_filt[0]);
 //	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_FRONT_LATERAL_XYZ,	DOP_FLOAT32,	    3,    &GrfDataObj.F_FL_filt[0]);
-//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_XYZ,			DOP_FLOAT32,	    3,    &GrfDataObj.F_Ba_filt[0]);
+//	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_BACK_XYZ,			DOP_FLOAT32,	    3,    &GrfDataObj.F_BA_filt[0]);
 
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_X,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_X);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_Y,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_Y);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_Z,					DOP_FLOAT32,	    1,    &GrfDataObj.GRF_Z);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_X,				DOP_FLOAT32,	    1,    &GrfDataObj.GRF_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_Y,				DOP_FLOAT32,	    1,    &GrfDataObj.GRF_Y);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_GRF_Z,				DOP_FLOAT32,	    1,    &GrfDataObj.GRF_Z);
 
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP_X,					DOP_FLOAT32,	    1,    &GrfDataObj.COP_X);
-	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP_Y,					DOP_FLOAT32,	    1,    &GrfDataObj.COP_Y);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP_X,				DOP_FLOAT32,	    1,    &GrfDataObj.COP_X);
+	DOP_CreatePDO(TASK_ID_EXTDEV, 	 PDO_ID_EXTDEV_COP_Y,				DOP_FLOAT32,	    1,    &GrfDataObj.COP_Y);
 
 /*
 #ifdef GRF_RIGHT
@@ -416,8 +416,26 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 	grfDataObj->rawS4[1] = rawGRF[7];
 	grfDataObj->rawS4[2] = rawGRF[8];
 
+	/* (1) No Filtering Version */
+	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
+	// S2 - x,y,z //
+	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+
+	// S3 - x,y,z //
+	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+
+	// S4 - x,y,z //
+	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+	/* (2) Filtering Version */
 //	/* For Low Pass Filtering */
 //	grfDataObj->rawS2LPF[0] = 0.97*grfDataObj->rawS2LPF[0] + 0.03*grfDataObj->rawS2[0];
 //	grfDataObj->rawS2LPF[1] = 0.97*grfDataObj->rawS2LPF[1] + 0.03*grfDataObj->rawS2[1];
@@ -446,26 +464,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 //	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4LPF[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
 //	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4LPF[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
 //	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4LPF[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
-
-
-
-
-	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
-	// S2 - x,y,z //
-	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
-
-	// S3 - x,y,z //
-	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
-
-	// S4 - x,y,z //
-	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
-
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	/* Calculate Voltage to Strain */
@@ -482,6 +481,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 
 
 	/* Calculate the Force (Choose proper CalibMatrix) */
+	/* Right GRF */
 	if (grfBoardNodeID == 14)
 	{
 		for (uint8_t i = 0; i < 3 ; i++){
@@ -495,6 +495,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 			}
 		}
 	}
+	/* Left GRF */
 	else if (grfBoardNodeID == 15)
 	{
 		for (uint8_t i = 0; i < 3 ; i++){
@@ -508,6 +509,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 			}
 		}
 	}
+	/* Error */
 	else
 	{
 		for (uint8_t i = 0; i < 3 ; i++){
@@ -515,57 +517,57 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 			grfDataObj->F_S3[i] = 0;
 			grfDataObj->F_S4[i] = 0;
 		}
+		grfSelectionErr = 1;
 	}
 
 	return 0;
 }
 
 
-#ifdef GRF_RIGHT
 static int Force_Labeling(GRF_Data_t* grfDataObj)
 {
 	grfDataObj->GRF_X  = 0;
 	grfDataObj->GRF_Y  = 0;
 	grfDataObj->GRF_Z  = 0;
 
-	grfDataObj->F_FM[0] = RotMat_S2[0][0]*grfDataObj->F_S2[0] + RotMat_S2[0][1]*grfDataObj->F_S2[1] + RotMat_S2[0][2]*grfDataObj->F_S2[2];
-	grfDataObj->F_FL[0] = RotMat_S4[0][0]*grfDataObj->F_S4[0] + RotMat_S4[0][1]*grfDataObj->F_S4[1] + RotMat_S4[0][2]*grfDataObj->F_S4[2];
-	grfDataObj->F_Ba[0] = RotMat_S3[0][0]*grfDataObj->F_S3[0] + RotMat_S3[0][1]*grfDataObj->F_S3[1] + RotMat_S3[0][2]*grfDataObj->F_S3[2];
+	/* Right GRF */
+	if (grfBoardNodeID == 14) {
+		grfDataObj->F_FM[0] = RotMat_S2[0][0]*grfDataObj->F_S2[0] + RotMat_S2[0][1]*grfDataObj->F_S2[1] + RotMat_S2[0][2]*grfDataObj->F_S2[2];
+		grfDataObj->F_FL[0] = RotMat_S4[0][0]*grfDataObj->F_S4[0] + RotMat_S4[0][1]*grfDataObj->F_S4[1] + RotMat_S4[0][2]*grfDataObj->F_S4[2];
+		grfDataObj->F_BA[0] = RotMat_S3[0][0]*grfDataObj->F_S3[0] + RotMat_S3[0][1]*grfDataObj->F_S3[1] + RotMat_S3[0][2]*grfDataObj->F_S3[2];
 
-	grfDataObj->F_FM[1] = RotMat_S2[1][0]*grfDataObj->F_S2[0] + RotMat_S2[1][1]*grfDataObj->F_S2[1] + RotMat_S2[1][2]*grfDataObj->F_S2[2];
-	grfDataObj->F_FL[1] = RotMat_S4[1][0]*grfDataObj->F_S4[0] + RotMat_S4[1][1]*grfDataObj->F_S4[1] + RotMat_S4[1][2]*grfDataObj->F_S4[2];
-	grfDataObj->F_Ba[1] = RotMat_S3[1][0]*grfDataObj->F_S3[0] + RotMat_S3[1][1]*grfDataObj->F_S3[1] + RotMat_S3[1][2]*grfDataObj->F_S3[2];
+		grfDataObj->F_FM[1] = RotMat_S2[1][0]*grfDataObj->F_S2[0] + RotMat_S2[1][1]*grfDataObj->F_S2[1] + RotMat_S2[1][2]*grfDataObj->F_S2[2];
+		grfDataObj->F_FL[1] = RotMat_S4[1][0]*grfDataObj->F_S4[0] + RotMat_S4[1][1]*grfDataObj->F_S4[1] + RotMat_S4[1][2]*grfDataObj->F_S4[2];
+		grfDataObj->F_BA[1] = RotMat_S3[1][0]*grfDataObj->F_S3[0] + RotMat_S3[1][1]*grfDataObj->F_S3[1] + RotMat_S3[1][2]*grfDataObj->F_S3[2];
 
-	grfDataObj->F_FM[2] = RotMat_S2[2][0]*grfDataObj->F_S2[0] + RotMat_S2[2][1]*grfDataObj->F_S2[1] + RotMat_S2[2][2]*grfDataObj->F_S2[2];
-	grfDataObj->F_FL[2] = RotMat_S4[2][0]*grfDataObj->F_S4[0] + RotMat_S4[2][1]*grfDataObj->F_S4[1] + RotMat_S4[2][2]*grfDataObj->F_S4[2];
-	grfDataObj->F_Ba[2] = RotMat_S3[2][0]*grfDataObj->F_S3[0] + RotMat_S3[2][1]*grfDataObj->F_S3[1] + RotMat_S3[2][2]*grfDataObj->F_S3[2];
+		grfDataObj->F_FM[2] = RotMat_S2[2][0]*grfDataObj->F_S2[0] + RotMat_S2[2][1]*grfDataObj->F_S2[1] + RotMat_S2[2][2]*grfDataObj->F_S2[2];
+		grfDataObj->F_FL[2] = RotMat_S4[2][0]*grfDataObj->F_S4[0] + RotMat_S4[2][1]*grfDataObj->F_S4[1] + RotMat_S4[2][2]*grfDataObj->F_S4[2];
+		grfDataObj->F_BA[2] = RotMat_S3[2][0]*grfDataObj->F_S3[0] + RotMat_S3[2][1]*grfDataObj->F_S3[1] + RotMat_S3[2][2]*grfDataObj->F_S3[2];
+	}
+
+	/* Left GRF */
+	else if (grfBoardNodeID == 15) {
+		grfDataObj->F_FM[0] = RotMat_S2[0][0]*grfDataObj->F_S2[0] + RotMat_S2[0][1]*grfDataObj->F_S2[1] + RotMat_S2[0][2]*grfDataObj->F_S2[2];
+		grfDataObj->F_FL[0] = RotMat_S3[0][0]*grfDataObj->F_S3[0] + RotMat_S3[0][1]*grfDataObj->F_S3[1] + RotMat_S3[0][2]*grfDataObj->F_S3[2];
+		grfDataObj->F_BA[0] = RotMat_S4[0][0]*grfDataObj->F_S4[0] + RotMat_S4[0][1]*grfDataObj->F_S4[1] + RotMat_S4[0][2]*grfDataObj->F_S4[2];
+
+		grfDataObj->F_FM[1] = RotMat_S2[1][0]*grfDataObj->F_S2[0] + RotMat_S2[1][1]*grfDataObj->F_S2[1] + RotMat_S2[1][2]*grfDataObj->F_S2[2];
+		grfDataObj->F_FL[1] = RotMat_S3[1][0]*grfDataObj->F_S3[0] + RotMat_S3[1][1]*grfDataObj->F_S3[1] + RotMat_S3[1][2]*grfDataObj->F_S3[2];
+		grfDataObj->F_BA[1] = RotMat_S4[1][0]*grfDataObj->F_S4[0] + RotMat_S4[1][1]*grfDataObj->F_S4[1] + RotMat_S4[1][2]*grfDataObj->F_S4[2];
+
+		grfDataObj->F_FM[2] = RotMat_S2[2][0]*grfDataObj->F_S2[0] + RotMat_S2[2][1]*grfDataObj->F_S2[1] + RotMat_S2[2][2]*grfDataObj->F_S2[2];
+		grfDataObj->F_FL[2] = RotMat_S3[2][0]*grfDataObj->F_S3[0] + RotMat_S3[2][1]*grfDataObj->F_S3[1] + RotMat_S3[2][2]*grfDataObj->F_S3[2];
+		grfDataObj->F_BA[2] = RotMat_S4[2][0]*grfDataObj->F_S4[0] + RotMat_S4[2][1]*grfDataObj->F_S4[1] + RotMat_S4[2][2]*grfDataObj->F_S4[2];
+	}
+
+	/* Error */
+	else {
+		grfSelectionErr = 1;
+	}
 
 	return 0;
 }
-#endif
 
-#ifdef GRF_LEFT
-static int Force_Labeling(GRF_Data_t* grfDataObj)
-{
-	grfDataObj->GRF_X  = 0;
-	grfDataObj->GRF_Y  = 0;
-	grfDataObj->GRF_Z  = 0;
-
-	grfDataObj->F_FM[0] = RotMat_S2[0][0]*grfDataObj->F_S2[0] + RotMat_S2[0][1]*grfDataObj->F_S2[1] + RotMat_S2[0][2]*grfDataObj->F_S2[2];
-	grfDataObj->F_FL[0] = RotMat_S3[0][0]*grfDataObj->F_S3[0] + RotMat_S3[0][1]*grfDataObj->F_S3[1] + RotMat_S3[0][2]*grfDataObj->F_S3[2];
-	grfDataObj->F_Ba[0] = RotMat_S4[0][0]*grfDataObj->F_S4[0] + RotMat_S4[0][1]*grfDataObj->F_S4[1] + RotMat_S4[0][2]*grfDataObj->F_S4[2];
-
-	grfDataObj->F_FM[1] = RotMat_S2[1][0]*grfDataObj->F_S2[0] + RotMat_S2[1][1]*grfDataObj->F_S2[1] + RotMat_S2[1][2]*grfDataObj->F_S2[2];
-	grfDataObj->F_FL[1] = RotMat_S3[1][0]*grfDataObj->F_S3[0] + RotMat_S3[1][1]*grfDataObj->F_S3[1] + RotMat_S3[1][2]*grfDataObj->F_S3[2];
-	grfDataObj->F_Ba[1] = RotMat_S4[1][0]*grfDataObj->F_S4[0] + RotMat_S4[1][1]*grfDataObj->F_S4[1] + RotMat_S4[1][2]*grfDataObj->F_S4[2];
-
-	grfDataObj->F_FM[2] = RotMat_S2[2][0]*grfDataObj->F_S2[0] + RotMat_S2[2][1]*grfDataObj->F_S2[1] + RotMat_S2[2][2]*grfDataObj->F_S2[2];
-	grfDataObj->F_FL[2] = RotMat_S3[2][0]*grfDataObj->F_S3[0] + RotMat_S3[2][1]*grfDataObj->F_S3[1] + RotMat_S3[2][2]*grfDataObj->F_S3[2];
-	grfDataObj->F_Ba[2] = RotMat_S4[2][0]*grfDataObj->F_S4[0] + RotMat_S4[2][1]*grfDataObj->F_S4[1] + RotMat_S4[2][2]*grfDataObj->F_S4[2];
-
-	return 0;
-}
-#endif
 
 
 static int GetFiltGRF(GRF_Data_t* grfDataObj)
@@ -591,49 +593,49 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 		grfDataObj->F_S4_f[i] = grfDataObj->F_S4[i];*/
 
 		/* Rate Limiter */
-		if (abs(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) > thresh_RateLimiter){
+		if (abs(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) > thresh_RateLimiter) {
 			grfDataObj->F_FM_f[i] = grfDataObj->F_FM_prev[i] - sign(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) * thresh_RateLimiter;
 		}
-		else{
+		else {
 			grfDataObj->F_FM_f[i] = grfDataObj->F_FM[i];
 		}
-		if (abs(grfDataObj->F_FL_f[i] - grfDataObj->F_S3[i]) > thresh_RateLimiter){
+		if (abs(grfDataObj->F_FL_f[i] - grfDataObj->F_S3[i]) > thresh_RateLimiter) {
 			grfDataObj->F_FL_f[i] = grfDataObj->F_FL_prev[i] - sign(grfDataObj->F_FL_prev[i] - grfDataObj->F_FL[i]) * thresh_RateLimiter;
 		}
-		else{
+		else {
 			grfDataObj->F_FL_f[i] = grfDataObj->F_FL[i];
 		}
-		if (abs(grfDataObj->F_Ba_f[i] - grfDataObj->F_Ba[i]) > thresh_RateLimiter){
-			grfDataObj->F_Ba_f[i] = grfDataObj->F_Ba_prev[i] - sign(grfDataObj->F_Ba_prev[i] - grfDataObj->F_Ba[i]) * thresh_RateLimiter;
+		if (abs(grfDataObj->F_BA_f[i] - grfDataObj->F_BA[i]) > thresh_RateLimiter) {
+			grfDataObj->F_BA_f[i] = grfDataObj->F_BA_prev[i] - sign(grfDataObj->F_BA_prev[i] - grfDataObj->F_BA[i]) * thresh_RateLimiter;
 		}
-		else{
-			grfDataObj->F_Ba_f[i] = grfDataObj->F_Ba[i];
+		else {
+			grfDataObj->F_BA_f[i] = grfDataObj->F_BA[i];
 		}
 		grfDataObj->F_FM_prev[i] = grfDataObj->F_FM_f[i];
 		grfDataObj->F_FL_prev[i] = grfDataObj->F_FL_f[i];
-		grfDataObj->F_Ba_prev[i] = grfDataObj->F_Ba_f[i];
+		grfDataObj->F_BA_prev[i] = grfDataObj->F_BA_f[i];
 
 		/* Low Pass Filter */
-		float fc = 4; // Cut-off frequency
-		float a_LPF = 1 / (1 + 1/(2*M_PI*fc*0.001));
+		static float fc = 4; // Cut-off frequency
+		static float a_LPF = 1 / (1 + 1/(2*M_PI*fc*0.001));
 		grfDataObj->F_FM_LPF[i] = (1 - a_LPF)*grfDataObj->F_FM_LPF[i] + a_LPF*grfDataObj->F_FM_f[i];
 		grfDataObj->F_FL_LPF[i] = (1 - a_LPF)*grfDataObj->F_FL_LPF[i] + a_LPF*grfDataObj->F_FL_f[i];
-		grfDataObj->F_Ba_LPF[i] = (1 - a_LPF)*grfDataObj->F_Ba_LPF[i] + a_LPF*grfDataObj->F_Ba_f[i];
+		grfDataObj->F_BA_LPF[i] = (1 - a_LPF)*grfDataObj->F_BA_LPF[i] + a_LPF*grfDataObj->F_BA_f[i];
 //		grfDataObj->F_FM_LPF[i] = 0.982*grfDataObj->F_FM_LPF[i] + 0.018*grfDataObj->F_FM_f[i];
 //		grfDataObj->F_FL_LPF[i] = 0.982*grfDataObj->F_FL_LPF[i] + 0.018*grfDataObj->F_FL_f[i];
-//		grfDataObj->F_Ba_LPF[i] = 0.982*grfDataObj->F_Ba_LPF[i] + 0.018*grfDataObj->F_Ba_f[i];
+//		grfDataObj->F_BA_LPF[i] = 0.982*grfDataObj->F_BA_LPF[i] + 0.018*grfDataObj->F_BA_f[i];
 
 
 	}
 
 	grfDataObj->F_FM_LPF_X = grfDataObj->F_FM_LPF[0]; grfDataObj->F_FM_LPF_Y = grfDataObj->F_FM_LPF[1]; grfDataObj->F_FM_LPF_Z = grfDataObj->F_FM_LPF[2];
 	grfDataObj->F_FL_LPF_X = grfDataObj->F_FL_LPF[0]; grfDataObj->F_FL_LPF_Y = grfDataObj->F_FL_LPF[1]; grfDataObj->F_FL_LPF_Z = grfDataObj->F_FL_LPF[2];
-	grfDataObj->F_Ba_LPF_X = grfDataObj->F_Ba_LPF[0]; grfDataObj->F_Ba_LPF_Y = grfDataObj->F_Ba_LPF[1]; grfDataObj->F_Ba_LPF_Z = grfDataObj->F_Ba_LPF[2];
+	grfDataObj->F_BA_LPF_X = grfDataObj->F_BA_LPF[0]; grfDataObj->F_BA_LPF_Y = grfDataObj->F_BA_LPF[1]; grfDataObj->F_BA_LPF_Z = grfDataObj->F_BA_LPF[2];
 
 	/* Force Threshold */
 	grfDataObj->F_FM_norm = sqrt(grfDataObj->F_FM_LPF[0]*grfDataObj->F_FM_LPF[0] + grfDataObj->F_FM_LPF[1]*grfDataObj->F_FM_LPF[1] + grfDataObj->F_FM_LPF[2]*grfDataObj->F_FM_LPF[2]);
 	grfDataObj->F_FL_norm = sqrt(grfDataObj->F_FL_LPF[0]*grfDataObj->F_FL_LPF[0] + grfDataObj->F_FL_LPF[1]*grfDataObj->F_FL_LPF[1] + grfDataObj->F_FL_LPF[2]*grfDataObj->F_FL_LPF[2]);
-	grfDataObj->F_Ba_norm = sqrt(grfDataObj->F_Ba_LPF[0]*grfDataObj->F_Ba_LPF[0] + grfDataObj->F_Ba_LPF[1]*grfDataObj->F_Ba_LPF[1] + grfDataObj->F_Ba_LPF[2]*grfDataObj->F_Ba_LPF[2]);
+	grfDataObj->F_BA_norm = sqrt(grfDataObj->F_BA_LPF[0]*grfDataObj->F_BA_LPF[0] + grfDataObj->F_BA_LPF[1]*grfDataObj->F_BA_LPF[1] + grfDataObj->F_BA_LPF[2]*grfDataObj->F_BA_LPF[2]);
 
 	if (grfDataObj->F_FM_norm < thresh_sensor){
 		for (uint8_t i = 0; i < 3; i++){
@@ -655,25 +657,26 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 			grfDataObj->F_FL_filt[i] = grfDataObj->F_FL_LPF[i];
 		}
 	}
-	if (grfDataObj->F_Ba_norm < thresh_sensor){
+	if (grfDataObj->F_BA_norm < thresh_sensor){
 		for (uint8_t i = 0; i < 3; i++){
-			grfDataObj->F_Ba_filt[i] = 0;
+			grfDataObj->F_BA_filt[i] = 0;
 		}
 	}
 	else{
 		for (uint8_t i = 0; i <3; i++){
-			grfDataObj->F_Ba_filt[i] = grfDataObj->F_Ba_LPF[i];
+			grfDataObj->F_BA_filt[i] = grfDataObj->F_BA_LPF[i];
 		}
 	}
 
 	return 0;
 }
 
+
 static int Get_Total_GRF(GRF_Data_t* grfDataObj)
 {
 	grfDataObj->Force_FM_X = grfDataObj->F_FM_filt[0]; grfDataObj->Force_FM_Y = grfDataObj->F_FM_filt[1]; grfDataObj->Force_FM_Z = grfDataObj->F_FM_filt[2];
 	grfDataObj->Force_FL_X = grfDataObj->F_FL_filt[0]; grfDataObj->Force_FL_Y = grfDataObj->F_FL_filt[1]; grfDataObj->Force_FL_Z = grfDataObj->F_FL_filt[2];
-	grfDataObj->Force_Ba_X = grfDataObj->F_Ba_filt[0]; grfDataObj->Force_Ba_Y = grfDataObj->F_Ba_filt[1]; grfDataObj->Force_Ba_Z = grfDataObj->F_Ba_filt[2];
+	grfDataObj->Force_Ba_X = grfDataObj->F_BA_filt[0]; grfDataObj->Force_Ba_Y = grfDataObj->F_BA_filt[1]; grfDataObj->Force_Ba_Z = grfDataObj->F_BA_filt[2];
 
 	grfDataObj->GRF_X = grfDataObj->Force_FM_X + grfDataObj->Force_FL_X + grfDataObj->Force_Ba_X;
 	grfDataObj->GRF_Y = grfDataObj->Force_FM_Y + grfDataObj->Force_FL_Y + grfDataObj->Force_Ba_Y;
@@ -682,55 +685,58 @@ static int Get_Total_GRF(GRF_Data_t* grfDataObj)
 	return 0;
 }
 
-#ifdef GRF_RIGHT
+
 static int Get_Total_COP(GRF_Data_t* grfDataObj)
 {
-	if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) )
-//	if ( (abs(grfDataObj->GRF_Z) > thresh_vert) )
-	{
-		float c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - rx_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_Ba_X);
-		float c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) + ry_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_Ba_Y);
+	static float c_x = 0;
+	static float c_y = 0;
 
-		grfDataObj->COP_X = c_x/grfDataObj->GRF_Z;
-		grfDataObj->COP_Y = c_y/grfDataObj->GRF_Z;
-		grfDataObj->COP_Z = 0;
+	/* Right GRF */
+	if (grfBoardNodeID == 14) {
+		if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) ) {
+			c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - rx_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_Ba_X);
+			c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) + ry_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_Ba_Y);
+
+			grfDataObj->COP_X = c_x / grfDataObj->GRF_Z;
+			grfDataObj->COP_Y = c_y / grfDataObj->GRF_Z;
+			grfDataObj->COP_Z = 0;
+		}
+		else {
+			grfDataObj->COP_X = 0;
+			grfDataObj->COP_Y = 0;
+			grfDataObj->COP_Z = 0;
+		}
 	}
-	else
-	{
-		grfDataObj->COP_X = 0;
-		grfDataObj->COP_Y = 0;
-		grfDataObj->COP_Z = 0;
+
+	/* Left GRF */
+	else if (grfBoardNodeID == 15) {
+		if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) )
+		{
+			c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - rx_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_Ba_X);
+			c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - ry_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_Ba_Y);
+
+			grfDataObj->COP_X = c_x / grfDataObj->GRF_Z;
+			grfDataObj->COP_Y = c_y / grfDataObj->GRF_Z;
+			grfDataObj->COP_Z = 0;
+		}
+		else
+		{
+			grfDataObj->COP_X = 0;
+			grfDataObj->COP_Y = 0;
+			grfDataObj->COP_Z = 0;
+		}
 	}
+
+	/* Error */
+	else {
+		grfSelectionErr = 1;
+	}
+
 	return 0;
-
 }
-#endif
-
-#ifdef GRF_LEFT
-static int Get_Total_COP(GRF_Data_t* grfDataObj)
-{
-	if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) )
-	{
-		float c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - rx_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_Ba_X);
-		float c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - ry_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_Ba_Y);
-
-		grfDataObj->COP_X = c_x/grfDataObj->GRF_Z;
-		grfDataObj->COP_Y = c_y/grfDataObj->GRF_Z;
-		grfDataObj->COP_Z = 0;
-	}
-	else
-	{
-		grfDataObj->COP_X = 0;
-		grfDataObj->COP_Y = 0;
-		grfDataObj->COP_Z = 0;
-	}
-	return 0;
-
-}
-#endif
 
 
-static int sign(double x) {
+static int sign(float x) {
     if (x > 0.0) {
         return 1;
     } else if (x < 0.0) {

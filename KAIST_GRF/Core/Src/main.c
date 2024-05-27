@@ -292,7 +292,7 @@ void DownloadProperties()
   IOIF_ReadFlash(readAddr, &GrfDataObj.rawS4offset[0], 	  IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
   IOIF_ReadFlash(readAddr, &GrfDataObj.rawS4offset[1],    IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
 
-  for(int i = 0; i<500; ++i) {}
+  for(int i = 0; i < 500; ++i) {}
 
   IOIF_ReadFlash(readAddr, &GrfDataObj.rawS4offset[2],    IOIF_FLASH_READ_SIZE_4B);  readAddr += IOIF_FLASH_READ_ADDR_SIZE_4B;
 }
