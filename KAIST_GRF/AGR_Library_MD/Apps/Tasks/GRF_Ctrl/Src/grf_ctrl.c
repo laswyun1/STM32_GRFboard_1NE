@@ -117,13 +117,13 @@ float RotMat_S4[3][3] = {{+0, +1, +0}, {+1, +0, +0}, {+0, +0, +1}};
 float rx_F = 220;
 float rx_B = 70;
 float ry_F = 70;
-float ry_B = 14;
+float ry_B = 7.5;   // 14;
 float rz = -10.5;
 
 /* ------------ TO BE TUNED ------------ */
-float thresh_sensor = 4.5;
-float thresh_vert = 7;
-float thresh_norm = 15;
+float thresh_sensor = 10;
+float thresh_vert = 20;
+float thresh_norm = 40;
 float thresh_RateLimiter = 15;
 /* ------------------------------------- */
 
@@ -363,11 +363,10 @@ static void StateEnable_Run(void)
 //	GetRawGRF(&GrfDataObj);
 
 	GetRawGRF(&GrfDataObj);
-
-//	Force_Labeling(&GrfDataObj);
-//	GetFiltGRF(&GrfDataObj);
-//	Get_Total_GRF(&GrfDataObj);
-//	Get_Total_COP(&GrfDataObj);
+	Force_Labeling(&GrfDataObj);
+	GetFiltGRF(&GrfDataObj);
+	Get_Total_GRF(&GrfDataObj);
+	Get_Total_COP(&GrfDataObj);
 
 
 	grfCtrlLoopCnt++;
@@ -420,68 +419,68 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 	/* (1) No Filtering Version */
 	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
 	// S2 - x,y,z //
-//	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
-//	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
-//	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
-//
-//	// S3 - x,y,z //
-//	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
-//	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
-//	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
-//
-//	// S4 - x,y,z //
-//	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
-//	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
-//	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+
+	// S3 - x,y,z //
+	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+
+	// S4 - x,y,z //
+	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	/* (2) Filtering Version */
 	/* For Low Pass Filtering */
-	static uint8_t firstRun = 0;
-	if (firstRun == 0){
-		grfDataObj->rawS2LPF[0] = 8192;
-		grfDataObj->rawS2LPF[1] = 8192;
-		grfDataObj->rawS2LPF[2] = 2730;
-
-		grfDataObj->rawS3LPF[0] = 8192;
-		grfDataObj->rawS3LPF[1] = 8192;
-		grfDataObj->rawS3LPF[2] = 2730;
-
-		grfDataObj->rawS4LPF[0] = 8192;
-		grfDataObj->rawS4LPF[1] = 8192;
-		grfDataObj->rawS4LPF[2] = 2730;
-
-		firstRun = 1;
-	}
-
-	grfDataObj->rawS2LPF[0] = 0.97*grfDataObj->rawS2LPF[0] + 0.03*grfDataObj->rawS2[0];
-	grfDataObj->rawS2LPF[1] = 0.97*grfDataObj->rawS2LPF[1] + 0.03*grfDataObj->rawS2[1];
-	grfDataObj->rawS2LPF[2] = 0.97*grfDataObj->rawS2LPF[2] + 0.03*grfDataObj->rawS2[2];
-
-	grfDataObj->rawS3LPF[0] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
-	grfDataObj->rawS3LPF[1] = 0.97*grfDataObj->rawS3LPF[1] + 0.03*grfDataObj->rawS3[1];
-	grfDataObj->rawS3LPF[2] = 0.97*grfDataObj->rawS3LPF[2] + 0.03*grfDataObj->rawS3[2];
-
-	grfDataObj->rawS4LPF[0] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
-	grfDataObj->rawS4LPF[1] = 0.97*grfDataObj->rawS4LPF[1] + 0.03*grfDataObj->rawS4[1];
-	grfDataObj->rawS4LPF[2] = 0.97*grfDataObj->rawS4LPF[2] + 0.03*grfDataObj->rawS4[2];
-
-	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
-	// S2 - x,y,z //
-	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2LPF[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2LPF[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2LPF[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
-
-	// S3 - x,y,z //
-	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3LPF[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3LPF[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3LPF[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
-
-	// S4 - x,y,z //
-	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4LPF[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4LPF[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4LPF[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+//	static uint8_t firstRun = 0;
+//	if (firstRun == 0){
+//		grfDataObj->rawS2LPF[0] = GrfDataObj.rawS2offset[0];
+//		grfDataObj->rawS2LPF[1] = GrfDataObj.rawS2offset[1];
+//		grfDataObj->rawS2LPF[2] = GrfDataObj.rawS2offset[2];
+//
+//		grfDataObj->rawS3LPF[0] = GrfDataObj.rawS3offset[0];
+//		grfDataObj->rawS3LPF[1] = GrfDataObj.rawS3offset[1];
+//		grfDataObj->rawS3LPF[2] = GrfDataObj.rawS3offset[2];
+//
+//		grfDataObj->rawS4LPF[0] = GrfDataObj.rawS4offset[0];
+//		grfDataObj->rawS4LPF[1] = GrfDataObj.rawS4offset[1];
+//		grfDataObj->rawS4LPF[2] = GrfDataObj.rawS4offset[2];
+//
+//		firstRun = 1;
+//	}
+//
+//	grfDataObj->rawS2LPF[0] = 0.97*grfDataObj->rawS2LPF[0] + 0.03*grfDataObj->rawS2[0];
+//	grfDataObj->rawS2LPF[1] = 0.97*grfDataObj->rawS2LPF[1] + 0.03*grfDataObj->rawS2[1];
+//	grfDataObj->rawS2LPF[2] = 0.97*grfDataObj->rawS2LPF[2] + 0.03*grfDataObj->rawS2[2];
+//
+//	grfDataObj->rawS3LPF[0] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
+//	grfDataObj->rawS3LPF[1] = 0.97*grfDataObj->rawS3LPF[1] + 0.03*grfDataObj->rawS3[1];
+//	grfDataObj->rawS3LPF[2] = 0.97*grfDataObj->rawS3LPF[2] + 0.03*grfDataObj->rawS3[2];
+//
+//	grfDataObj->rawS4LPF[0] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
+//	grfDataObj->rawS4LPF[1] = 0.97*grfDataObj->rawS4LPF[1] + 0.03*grfDataObj->rawS4[1];
+//	grfDataObj->rawS4LPF[2] = 0.97*grfDataObj->rawS4LPF[2] + 0.03*grfDataObj->rawS4[2];
+//
+//	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
+//	// S2 - x,y,z //
+//	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2LPF[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2LPF[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2LPF[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+//
+//	// S3 - x,y,z //
+//	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3LPF[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3LPF[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3LPF[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+//
+//	// S4 - x,y,z //
+//	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4LPF[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4LPF[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4LPF[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -541,10 +540,6 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 
 static int Force_Labeling(GRF_Data_t* grfDataObj)
 {
-	grfDataObj->GRF_X  = 0;
-	grfDataObj->GRF_Y  = 0;
-	grfDataObj->GRF_Z  = 0;
-
 	/* Right GRF */
 	if (grfBoardNodeID == 14) {
 		grfDataObj->F_FM[0] = RotMat_S2[0][0]*grfDataObj->F_S2[0] + RotMat_S2[0][1]*grfDataObj->F_S2[1] + RotMat_S2[0][2]*grfDataObj->F_S2[2];
@@ -590,7 +585,7 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 
 	for (uint8_t i = 0; i < 3; i++)
 	{
-		// 0.1Hz - 10Hz Bandpass Filter
+		// 0.1Hz - 10Hz BAndpass Filter
 /*		grfDataObj->F_FM_filt[i] = 1.938*grfDataObj->F_FM_filt[i] - 0.9385*grfDataObj->F_FM_filt_f[i] + 0.06088*grfDataObj->F_FM_f[i] - 0.06088*grfDataObj->F_FM_ff[i];
 		grfDataObj->F_S3_filt[i] = 1.938*grfDataObj->F_S3_filt[i] - 0.9385*grfDataObj->F_S3_filt_f[i] + 0.06088*grfDataObj->F_S3_f[i] - 0.06088*grfDataObj->F_S3_ff[i];
 		grfDataObj->F_S4_filt[i] = 1.938*grfDataObj->F_S4_filt[i] - 0.9385*grfDataObj->F_S4_filt_f[i] + 0.06088*grfDataObj->F_S4_f[i] - 0.06088*grfDataObj->F_S4_ff[i];
@@ -608,27 +603,32 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 		grfDataObj->F_S4_f[i] = grfDataObj->F_S4[i];*/
 
 		/* Rate Limiter */
-		if (abs(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) > thresh_RateLimiter) {
-			grfDataObj->F_FM_f[i] = grfDataObj->F_FM_prev[i] - sign(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) * thresh_RateLimiter;
-		}
-		else {
-			grfDataObj->F_FM_f[i] = grfDataObj->F_FM[i];
-		}
-		if (abs(grfDataObj->F_FL_f[i] - grfDataObj->F_S3[i]) > thresh_RateLimiter) {
-			grfDataObj->F_FL_f[i] = grfDataObj->F_FL_prev[i] - sign(grfDataObj->F_FL_prev[i] - grfDataObj->F_FL[i]) * thresh_RateLimiter;
-		}
-		else {
-			grfDataObj->F_FL_f[i] = grfDataObj->F_FL[i];
-		}
-		if (abs(grfDataObj->F_BA_f[i] - grfDataObj->F_BA[i]) > thresh_RateLimiter) {
-			grfDataObj->F_BA_f[i] = grfDataObj->F_BA_prev[i] - sign(grfDataObj->F_BA_prev[i] - grfDataObj->F_BA[i]) * thresh_RateLimiter;
-		}
-		else {
-			grfDataObj->F_BA_f[i] = grfDataObj->F_BA[i];
-		}
-		grfDataObj->F_FM_prev[i] = grfDataObj->F_FM_f[i];
-		grfDataObj->F_FL_prev[i] = grfDataObj->F_FL_f[i];
-		grfDataObj->F_BA_prev[i] = grfDataObj->F_BA_f[i];
+//		if (abs(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) > thresh_RateLimiter) {
+//			grfDataObj->F_FM_f[i] = grfDataObj->F_FM_prev[i] - sign(grfDataObj->F_FM_prev[i] - grfDataObj->F_FM[i]) * thresh_RateLimiter;
+//		}
+//		else {
+//			grfDataObj->F_FM_f[i] = grfDataObj->F_FM[i];
+//		}
+//		if (abs(grfDataObj->F_FL_f[i] - grfDataObj->F_S3[i]) > thresh_RateLimiter) {
+//			grfDataObj->F_FL_f[i] = grfDataObj->F_FL_prev[i] - sign(grfDataObj->F_FL_prev[i] - grfDataObj->F_FL[i]) * thresh_RateLimiter;
+//		}
+//		else {
+//			grfDataObj->F_FL_f[i] = grfDataObj->F_FL[i];
+//		}
+//		if (abs(grfDataObj->F_BA_f[i] - grfDataObj->F_BA[i]) > thresh_RateLimiter) {
+//			grfDataObj->F_BA_f[i] = grfDataObj->F_BA_prev[i] - sign(grfDataObj->F_BA_prev[i] - grfDataObj->F_BA[i]) * thresh_RateLimiter;
+//		}
+//		else {
+//			grfDataObj->F_BA_f[i] = grfDataObj->F_BA[i];
+//		}
+//		grfDataObj->F_FM_prev[i] = grfDataObj->F_FM_f[i];
+//		grfDataObj->F_FL_prev[i] = grfDataObj->F_FL_f[i];
+//		grfDataObj->F_BA_prev[i] = grfDataObj->F_BA_f[i];
+
+		/* No Rate Limiter */
+		grfDataObj->F_FM_f[i] = grfDataObj->F_FM[i];
+		grfDataObj->F_FL_f[i] = grfDataObj->F_FL[i];
+		grfDataObj->F_BA_f[i] = grfDataObj->F_BA[i];
 
 		/* Low Pass Filter */
 		float fc = 4; // Cut-off frequency
@@ -636,11 +636,6 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 		grfDataObj->F_FM_LPF[i] = (1 - a_LPF)*grfDataObj->F_FM_LPF[i] + a_LPF*grfDataObj->F_FM_f[i];
 		grfDataObj->F_FL_LPF[i] = (1 - a_LPF)*grfDataObj->F_FL_LPF[i] + a_LPF*grfDataObj->F_FL_f[i];
 		grfDataObj->F_BA_LPF[i] = (1 - a_LPF)*grfDataObj->F_BA_LPF[i] + a_LPF*grfDataObj->F_BA_f[i];
-//		grfDataObj->F_FM_LPF[i] = 0.982*grfDataObj->F_FM_LPF[i] + 0.018*grfDataObj->F_FM_f[i];
-//		grfDataObj->F_FL_LPF[i] = 0.982*grfDataObj->F_FL_LPF[i] + 0.018*grfDataObj->F_FL_f[i];
-//		grfDataObj->F_BA_LPF[i] = 0.982*grfDataObj->F_BA_LPF[i] + 0.018*grfDataObj->F_BA_f[i];
-
-
 	}
 
 	grfDataObj->F_FM_LPF_X = grfDataObj->F_FM_LPF[0]; grfDataObj->F_FM_LPF_Y = grfDataObj->F_FM_LPF[1]; grfDataObj->F_FM_LPF_Z = grfDataObj->F_FM_LPF[2];
@@ -652,35 +647,45 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 	grfDataObj->F_FL_norm = sqrt(grfDataObj->F_FL_LPF[0]*grfDataObj->F_FL_LPF[0] + grfDataObj->F_FL_LPF[1]*grfDataObj->F_FL_LPF[1] + grfDataObj->F_FL_LPF[2]*grfDataObj->F_FL_LPF[2]);
 	grfDataObj->F_BA_norm = sqrt(grfDataObj->F_BA_LPF[0]*grfDataObj->F_BA_LPF[0] + grfDataObj->F_BA_LPF[1]*grfDataObj->F_BA_LPF[1] + grfDataObj->F_BA_LPF[2]*grfDataObj->F_BA_LPF[2]);
 
-	if (grfDataObj->F_FM_norm < thresh_sensor){
-		for (uint8_t i = 0; i < 3; i++){
-			grfDataObj->F_FM_filt[i] = 0;
-		}
-	}
-	else{
-		for (uint8_t i = 0; i <3; i++){
-			grfDataObj->F_FM_filt[i] = grfDataObj->F_FM_LPF[i];
-		}
-	}
-	if (grfDataObj->F_FL_norm < thresh_sensor){
-		for (uint8_t i = 0; i < 3; i++){
-			grfDataObj->F_FL_filt[i] = 0;
-		}
-	}
-	else{
-		for (uint8_t i = 0; i <3; i++){
-			grfDataObj->F_FL_filt[i] = grfDataObj->F_FL_LPF[i];
-		}
-	}
-	if (grfDataObj->F_BA_norm < thresh_sensor){
-		for (uint8_t i = 0; i < 3; i++){
-			grfDataObj->F_BA_filt[i] = 0;
-		}
-	}
-	else{
-		for (uint8_t i = 0; i <3; i++){
-			grfDataObj->F_BA_filt[i] = grfDataObj->F_BA_LPF[i];
-		}
+
+	/* Threshold */
+//	if (grfDataObj->F_FM_norm < thresh_sensor){
+//		for (uint8_t i = 0; i < 3; i++){
+//			grfDataObj->F_FM_filt[i] = 0;
+//		}
+//	}
+//	else{
+//		for (uint8_t i = 0; i <3; i++){
+//			grfDataObj->F_FM_filt[i] = grfDataObj->F_FM_LPF[i];
+//		}
+//	}
+//	if (grfDataObj->F_FL_norm < thresh_sensor){
+//		for (uint8_t i = 0; i < 3; i++){
+//			grfDataObj->F_FL_filt[i] = 0;
+//		}
+//	}
+//	else{
+//		for (uint8_t i = 0; i <3; i++){
+//			grfDataObj->F_FL_filt[i] = grfDataObj->F_FL_LPF[i];
+//		}
+//	}
+//	if (grfDataObj->F_BA_norm < thresh_sensor){
+//		for (uint8_t i = 0; i < 3; i++){
+//			grfDataObj->F_BA_filt[i] = 0;
+//		}
+//	}
+//	else{
+//		for (uint8_t i = 0; i <3; i++){
+//			grfDataObj->F_BA_filt[i] = grfDataObj->F_BA_LPF[i];
+//		}
+//	}
+
+
+	/* No Threshold */
+	for (uint8_t i = 0; i < 3; i++){
+		grfDataObj->F_FM_filt[i] = grfDataObj->F_FM_LPF[i];
+		grfDataObj->F_FL_filt[i] = grfDataObj->F_FL_LPF[i];
+		grfDataObj->F_BA_filt[i] = grfDataObj->F_BA_LPF[i];
 	}
 
 	return 0;
@@ -691,11 +696,11 @@ static int Get_Total_GRF(GRF_Data_t* grfDataObj)
 {
 	grfDataObj->Force_FM_X = grfDataObj->F_FM_filt[0]; grfDataObj->Force_FM_Y = grfDataObj->F_FM_filt[1]; grfDataObj->Force_FM_Z = grfDataObj->F_FM_filt[2];
 	grfDataObj->Force_FL_X = grfDataObj->F_FL_filt[0]; grfDataObj->Force_FL_Y = grfDataObj->F_FL_filt[1]; grfDataObj->Force_FL_Z = grfDataObj->F_FL_filt[2];
-	grfDataObj->Force_Ba_X = grfDataObj->F_BA_filt[0]; grfDataObj->Force_Ba_Y = grfDataObj->F_BA_filt[1]; grfDataObj->Force_Ba_Z = grfDataObj->F_BA_filt[2];
+	grfDataObj->Force_BA_X = grfDataObj->F_BA_filt[0]; grfDataObj->Force_BA_Y = grfDataObj->F_BA_filt[1]; grfDataObj->Force_BA_Z = grfDataObj->F_BA_filt[2];
 
-	grfDataObj->GRF_X = grfDataObj->Force_FM_X + grfDataObj->Force_FL_X + grfDataObj->Force_Ba_X;
-	grfDataObj->GRF_Y = grfDataObj->Force_FM_Y + grfDataObj->Force_FL_Y + grfDataObj->Force_Ba_Y;
-	grfDataObj->GRF_Z = grfDataObj->Force_FM_Z + grfDataObj->Force_FL_Z + grfDataObj->Force_Ba_Z;
+	grfDataObj->GRF_X = grfDataObj->Force_FM_X + grfDataObj->Force_FL_X + grfDataObj->Force_BA_X;
+	grfDataObj->GRF_Y = grfDataObj->Force_FM_Y + grfDataObj->Force_FL_Y + grfDataObj->Force_BA_Y;
+	grfDataObj->GRF_Z = grfDataObj->Force_FM_Z + grfDataObj->Force_FL_Z + grfDataObj->Force_BA_Z;
 
 	return 0;
 }
@@ -703,14 +708,18 @@ static int Get_Total_GRF(GRF_Data_t* grfDataObj)
 
 static int Get_Total_COP(GRF_Data_t* grfDataObj)
 {
-	static float c_x = 0;
-	static float c_y = 0;
+	float c_x = 0;
+	float c_y = 0;
 
 	/* Right GRF */
 	if (grfBoardNodeID == 14) {
 		if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) ) {
-			c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - rx_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_Ba_X);
-			c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) + ry_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_Ba_Y);
+			c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) \
+				  - rx_B * (grfDataObj->Force_BA_Z) \
+				  - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_BA_X);
+			c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) \
+				  + ry_B * (grfDataObj->Force_BA_Z) \
+				  - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_BA_Y);
 
 			grfDataObj->COP_X = c_x / grfDataObj->GRF_Z;
 			grfDataObj->COP_Y = c_y / grfDataObj->GRF_Z;
@@ -725,17 +734,20 @@ static int Get_Total_COP(GRF_Data_t* grfDataObj)
 
 	/* Left GRF */
 	else if (grfBoardNodeID == 15) {
-		if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) )
-		{
-			c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - rx_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_Ba_X);
-			c_y = ry_F * (-grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) - ry_B * (grfDataObj->Force_Ba_Z) - rz * (grfDataObj->Force_FL_Y + grfDataObj->Force_FM_Y + grfDataObj->Force_Ba_Y);
+		if ( (abs(grfDataObj->GRF_Z) > thresh_vert) && (sqrt((grfDataObj->GRF_X)*(grfDataObj->GRF_X) + (grfDataObj->GRF_Y)*(grfDataObj->GRF_Y) + (grfDataObj->GRF_Z)*(grfDataObj->GRF_Z)) > thresh_norm) ) {
+			c_x = rx_F * (grfDataObj->Force_FL_Z + grfDataObj->Force_FM_Z) \
+				  - rx_B * (grfDataObj->Force_BA_Z) \
+				  - rz * (grfDataObj->Force_FL_X + grfDataObj->Force_FM_X + grfDataObj->Force_BA_X);
+
+			c_y = ry_F * (-grfDataObj->Force_FM_Z + grfDataObj->Force_FL_Z) \
+				  - ry_B * (grfDataObj->Force_BA_Z) \
+				  - rz * (grfDataObj->Force_FM_Y + grfDataObj->Force_FL_Y + grfDataObj->Force_BA_Y);
 
 			grfDataObj->COP_X = c_x / grfDataObj->GRF_Z;
 			grfDataObj->COP_Y = c_y / grfDataObj->GRF_Z;
 			grfDataObj->COP_Z = 0;
 		}
-		else
-		{
+		else {
 			grfDataObj->COP_X = 0;
 			grfDataObj->COP_Y = 0;
 			grfDataObj->COP_Z = 0;

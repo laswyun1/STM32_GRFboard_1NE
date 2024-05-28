@@ -100,9 +100,9 @@ typedef struct _GRF_Data_t {
 	float Force_FL_Y;
 	float Force_FL_Z;
 
-	float Force_Ba_X;
-	float Force_Ba_Y;
-	float Force_Ba_Z;
+	float Force_BA_X;
+	float Force_BA_Y;
+	float Force_BA_Z;
 
 	float GRF_X;
 	float GRF_Y;
