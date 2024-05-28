@@ -363,10 +363,10 @@ static void StateEnable_Run(void)
 //	GetRawGRF(&GrfDataObj);
 
 	GetRawGRF(&GrfDataObj);
-	Force_Labeling(&GrfDataObj);
-	GetFiltGRF(&GrfDataObj);
-	Get_Total_GRF(&GrfDataObj);
-	Get_Total_COP(&GrfDataObj);
+//	Force_Labeling(&GrfDataObj);
+//	GetFiltGRF(&GrfDataObj);
+//	Get_Total_GRF(&GrfDataObj);
+//	Get_Total_COP(&GrfDataObj);
 
 
 	grfCtrlLoopCnt++;
@@ -419,51 +419,68 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 	/* (1) No Filtering Version */
 	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
 	// S2 - x,y,z //
-	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
-
-	// S3 - x,y,z //
-	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
-
-	// S4 - x,y,z //
-	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
-	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
-	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+//	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+//
+//	// S3 - x,y,z //
+//	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+//
+//	// S4 - x,y,z //
+//	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+//	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+//	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	/* (2) Filtering Version */
-//	/* For Low Pass Filtering */
-//	grfDataObj->rawS2LPF[0] = 0.97*grfDataObj->rawS2LPF[0] + 0.03*grfDataObj->rawS2[0];
-//	grfDataObj->rawS2LPF[1] = 0.97*grfDataObj->rawS2LPF[1] + 0.03*grfDataObj->rawS2[1];
-//	grfDataObj->rawS2LPF[2] = 0.97*grfDataObj->rawS2LPF[2] + 0.03*grfDataObj->rawS2[2];
-//
-//	grfDataObj->rawS3LPF[0] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
-//	grfDataObj->rawS3LPF[1] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
-//	grfDataObj->rawS3LPF[2] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
-//
-//	grfDataObj->rawS4LPF[0] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
-//	grfDataObj->rawS4LPF[1] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
-//	grfDataObj->rawS4LPF[2] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
-//
-//	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
-//	// S2 - x,y,z //
-//	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2LPF[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
-//	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2LPF[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
-//	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2LPF[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
-//
-//	// S3 - x,y,z //
-//	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3LPF[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
-//	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3LPF[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
-//	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3LPF[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
-//
-//	// S4 - x,y,z //
-//	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4LPF[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
-//	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4LPF[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
-//	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4LPF[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
+	/* For Low Pass Filtering */
+	static uint8_t firstRun = 0;
+	if (firstRun == 0){
+		grfDataObj->rawS2LPF[0] = 8192;
+		grfDataObj->rawS2LPF[1] = 8192;
+		grfDataObj->rawS2LPF[2] = 2730;
+
+		grfDataObj->rawS3LPF[0] = 8192;
+		grfDataObj->rawS3LPF[1] = 8192;
+		grfDataObj->rawS3LPF[2] = 2730;
+
+		grfDataObj->rawS4LPF[0] = 8192;
+		grfDataObj->rawS4LPF[1] = 8192;
+		grfDataObj->rawS4LPF[2] = 2730;
+
+		firstRun = 1;
+	}
+
+	grfDataObj->rawS2LPF[0] = 0.97*grfDataObj->rawS2LPF[0] + 0.03*grfDataObj->rawS2[0];
+	grfDataObj->rawS2LPF[1] = 0.97*grfDataObj->rawS2LPF[1] + 0.03*grfDataObj->rawS2[1];
+	grfDataObj->rawS2LPF[2] = 0.97*grfDataObj->rawS2LPF[2] + 0.03*grfDataObj->rawS2[2];
+
+	grfDataObj->rawS3LPF[0] = 0.97*grfDataObj->rawS3LPF[0] + 0.03*grfDataObj->rawS3[0];
+	grfDataObj->rawS3LPF[1] = 0.97*grfDataObj->rawS3LPF[1] + 0.03*grfDataObj->rawS3[1];
+	grfDataObj->rawS3LPF[2] = 0.97*grfDataObj->rawS3LPF[2] + 0.03*grfDataObj->rawS3[2];
+
+	grfDataObj->rawS4LPF[0] = 0.97*grfDataObj->rawS4LPF[0] + 0.03*grfDataObj->rawS4[0];
+	grfDataObj->rawS4LPF[1] = 0.97*grfDataObj->rawS4LPF[1] + 0.03*grfDataObj->rawS4[1];
+	grfDataObj->rawS4LPF[2] = 0.97*grfDataObj->rawS4LPF[2] + 0.03*grfDataObj->rawS4[2];
+
+	/* Calculate (0 ~ 3.3V) and compensate offset of S2,S3,S4 */
+	// S2 - x,y,z //
+	grfDataObj->voltS2[0] = (float)(((int32_t)grfDataObj->rawS2LPF[0] - (int32_t)grfDataObj->rawS2offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS2[1] = (float)(((int32_t)grfDataObj->rawS2LPF[1] - (int32_t)grfDataObj->rawS2offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS2[2] = (float)(((int32_t)grfDataObj->rawS2LPF[2] - (int32_t)grfDataObj->rawS2offset[2]) * 3.3 / 16383);
+
+	// S3 - x,y,z //
+	grfDataObj->voltS3[0] = (float)(((int32_t)grfDataObj->rawS3LPF[0] - (int32_t)grfDataObj->rawS3offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS3[1] = (float)(((int32_t)grfDataObj->rawS3LPF[1] - (int32_t)grfDataObj->rawS3offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS3[2] = (float)(((int32_t)grfDataObj->rawS3LPF[2] - (int32_t)grfDataObj->rawS3offset[2]) * 3.3 / 16383);
+
+	// S4 - x,y,z //
+	grfDataObj->voltS4[0] = (float)(((int32_t)grfDataObj->rawS4LPF[0] - (int32_t)grfDataObj->rawS4offset[0]) * 3.3 / 16383);
+	grfDataObj->voltS4[1] = (float)(((int32_t)grfDataObj->rawS4LPF[1] - (int32_t)grfDataObj->rawS4offset[1]) * 3.3 / 16383);
+	grfDataObj->voltS4[2] = (float)(((int32_t)grfDataObj->rawS4LPF[2] - (int32_t)grfDataObj->rawS4offset[2]) * 3.3 / 16383);
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -503,7 +520,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 			grfDataObj->F_S3[i] = 0;
 			grfDataObj->F_S4[i] = 0;
 			for (uint8_t j = 0; j < 3; j++){
-				grfDataObj->F_S2[i] += Calib_0905[i][j] * strainS2[j];
+				grfDataObj->F_S2[i] += Calib_0909[i][j] * strainS2[j];
 				grfDataObj->F_S3[i] += Calib_0904[i][j] * strainS3[j];
 				grfDataObj->F_S4[i] += Calib_0903[i][j] * strainS4[j];
 			}
@@ -616,8 +633,8 @@ static int GetFiltGRF(GRF_Data_t* grfDataObj)
 		grfDataObj->F_BA_prev[i] = grfDataObj->F_BA_f[i];
 
 		/* Low Pass Filter */
-		static float fc = 4; // Cut-off frequency
-		static float a_LPF = 1 / (1 + 1/(2*M_PI*fc*0.001));
+		float fc = 4; // Cut-off frequency
+		float a_LPF = 1 / (1 + 1/(2*M_PI*fc*0.001));
 		grfDataObj->F_FM_LPF[i] = (1 - a_LPF)*grfDataObj->F_FM_LPF[i] + a_LPF*grfDataObj->F_FM_f[i];
 		grfDataObj->F_FL_LPF[i] = (1 - a_LPF)*grfDataObj->F_FL_LPF[i] + a_LPF*grfDataObj->F_FL_f[i];
 		grfDataObj->F_BA_LPF[i] = (1 - a_LPF)*grfDataObj->F_BA_LPF[i] + a_LPF*grfDataObj->F_BA_f[i];

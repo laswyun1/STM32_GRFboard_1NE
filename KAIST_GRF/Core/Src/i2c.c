@@ -180,7 +180,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     }
 
     /* I2C1 interrupt Init */
-    HAL_NVIC_SetPriority(I2C1_EV_IRQn, 4, 0);
+    HAL_NVIC_SetPriority(I2C1_EV_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
   /* USER CODE BEGIN I2C1_MspInit 1 */
 
@@ -245,7 +245,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     }
 
     /* I2C2 interrupt Init */
-    HAL_NVIC_SetPriority(I2C2_EV_IRQn, 4, 0);
+    HAL_NVIC_SetPriority(I2C2_EV_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
   /* USER CODE BEGIN I2C2_MspInit 1 */
 
