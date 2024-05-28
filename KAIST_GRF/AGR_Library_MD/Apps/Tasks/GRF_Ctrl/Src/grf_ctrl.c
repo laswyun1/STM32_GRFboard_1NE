@@ -363,6 +363,7 @@ static void StateEnable_Run(void)
 //	GetRawGRF(&GrfDataObj);
 
 	GetRawGRF(&GrfDataObj);
+
 //	Force_Labeling(&GrfDataObj);
 //	GetFiltGRF(&GrfDataObj);
 //	Get_Total_GRF(&GrfDataObj);
@@ -499,8 +500,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 
 	/* Calculate the Force (Choose proper CalibMatrix) */
 	/* Right GRF */
-	if (grfBoardNodeID == 14)
-	{
+	if (grfBoardNodeID == 14) {
 		for (uint8_t i = 0; i < 3 ; i++){
 			grfDataObj->F_S2[i] = 0;
 			grfDataObj->F_S3[i] = 0;
@@ -513,8 +513,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 		}
 	}
 	/* Left GRF */
-	else if (grfBoardNodeID == 15)
-	{
+	else if (grfBoardNodeID == 15) {
 		for (uint8_t i = 0; i < 3 ; i++){
 			grfDataObj->F_S2[i] = 0;
 			grfDataObj->F_S3[i] = 0;
@@ -527,8 +526,7 @@ static int GetRawGRF(GRF_Data_t* grfDataObj)
 		}
 	}
 	/* Error */
-	else
-	{
+	else {
 		for (uint8_t i = 0; i < 3 ; i++){
 			grfDataObj->F_S2[i] = 0;
 			grfDataObj->F_S3[i] = 0;
